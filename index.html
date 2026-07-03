@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Financeira Pessoal - Sistema Manus</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+        .login-container, .dashboard { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .hidden { display: none; }
+        h2 { color: #333; text-align: center; }
+        .card { background: #eef2f7; padding: 15px; margin: 10px 0; border-radius: 6px; font-size: 1.1em; }
+        .btn { display: block; width: 100%; padding: 10px; background: #2b6cb0; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; }
+        .btn:hover { background: #2c5282; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="login-screen" class="login-container">
+    <h2>Sistema Manus - Login</h2>
+    <input type="password" id="password-input" placeholder="Introduza a sua password">
+    <button class="btn" onclick="verificarSenha()">Entrar</button>
+    <p id="error-msg" style="color: red; text-align: center; display: none;">Password incorreta!</p>
+</div>
+
+<!-- DASHBOARD PRINCIPAL -->
+<div id="dashboard-screen" class="dashboard hidden">
+    <h2>Gestão Financeira Pessoal</h2>
+    
+    <div class="card"><strong>Saldo Total:</strong> <span id="saldo-val">0.00</span> Kz</div>
+    <div class="card"><strong>Reserva:</strong> <span id="reserva-val">0.00</span> Kz</div>
+    <div class="card"><strong>Economia:</strong> <span id="economia-val">0.00</span> Kz</div>
+    <div class="card"><strong>Saídas / Despesas:</strong> <span id="saidas-val">0.00</span> Kz</div>
+
+    <h3>Adicionar Transação</h3>
+    <input type="number" id="valor-input" placeholder="Valor (Kz)">
+    <select id="tipo-input" style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px;">
+        <option value="saldo">Adicionar ao Saldo Total</option>
+        <option value="reserva">Mover para Reserva</option>
+        <option value="economia">Mover para Economia</option>
+        <option value="despesa">Registrar Saída/Despesa</option>
+    </select>
+    <button class="btn" onclick="atualizarValores()">Lançar no Sistema</button>
+</div>
+
+<script>
+    // Defina sua senha aqui
+    const PASSWORD_CORRETA = "1234"; 
+
+    // Inicialização de dados
+    let financas = JSON.parse(localStorage.getItem('financas')) || { saldo: 0, reserva: 0, economia: 0, saidas: 0 };
+
+    function verificarSenha() {
+        const input = document.getElementById('password-input').value;
+        if(input === PASSWORD_CORRETA) {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('hidden');
+            renderizarDados();
+        } else {
+            document.getElementById('error-msg').style.display = 'block';
+        }
+    }
+
+    function renderizarDados() {
+        document.getElementById('saldo-val').innerText = financas.saldo.toFixed(2);
+        document.getElementById('reserva-val').innerText = financas.reserva.toFixed(2);
+        document.getElementById('economia-val').innerText = financas.economia.toFixed(2);
+        document.getElementById('saidas-val').innerText = financas.saidas.toFixed(2);
+    }
+
+    function atualizarValores() {
+        const valor = parseFloat(document.getElementById('valor-input').value);
+        const tipo = document.getElementById('tipo-input').value;
+
+        if (isNaN(valor) || valor <= 0) return alert("Insira um valor válido.");
+
+        if (tipo === 'saldo') {
+            financas.saldo += valor;
+        } else if (tipo === 'reserva') {
+            if(financas.saldo >= valor) { financas.saldo -= valor; financas.reserva += valor; }
+            else alert("Saldo insuficiente.");
+        } else if (tipo === 'economia') {
+            if(financas.saldo >= valor) { financas.saldo -= valor; financas.economia += valor; }
+            else alert("Saldo insuficiente.");
+        } else if (tipo === 'despesa') {
+            if(financas.saldo >= valor) { financas.saldo -= valor; financas.saidas += valor; }
+            else alert("Saldo insuficiente.");
+        }
+
+        localStorage.setItem('financas', JSON.stringify(financas));
+        renderizarDados();
+        document.getElementById('valor-input').value = '';
+    }
+</script>
+</body>
+</html>
