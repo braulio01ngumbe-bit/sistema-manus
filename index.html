@@ -1,98 +1,248 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão Financeira Pessoal - Sistema Manus</title>
+    <title>Sistema Manus - Gestão Financeira Avançada</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
-        .login-container, .dashboard { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .hidden { display: none; }
-        h2 { color: #333; text-align: center; }
-        .card { background: #eef2f7; padding: 15px; margin: 10px 0; border-radius: 6px; font-size: 1.1em; }
-        .btn { display: block; width: 100%; padding: 10px; background: #2b6cb0; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; }
-        .btn:hover { background: #2c5282; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
-<!-- TELA DE LOGIN -->
-<div id="login-screen" class="login-container">
-    <h2>Sistema Manus - Login</h2>
-    <input type="password" id="password-input" placeholder="Introduza a sua password">
-    <button class="btn" onclick="verificarSenha()">Entrar</button>
-    <p id="error-msg" style="color: red; text-align: center; display: none;">Password incorreta!</p>
-</div>
+    <div id="login-screen" class="flex items-center justify-center min-h-screen px-4">
+        <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-extrabold text-blue-500 tracking-wide">SISTEMA MANUS</h2>
+                <p class="text-slate-400 text-sm mt-2">Gestão Financeira Pessoal & Familiar</p>
+            </div>
+            <div class="space-y-4">
+                <input type="password" id="password-input" placeholder="Introduza a sua password" 
+                    class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl focus:outline-none focus:border-blue-500 text-white placeholder-slate-400">
+                <button onclick="verificarSenha()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition duration-200 shadow-lg shadow-blue-900/40">
+                    Aceder ao Painel
+                </button>
+                <p id="error-msg" class="text-red-400 text-center text-sm hidden font-medium">Password incorreta! Tente novamente.</p>
+            </div>
+        </div>
+    </div>
 
-<!-- DASHBOARD PRINCIPAL -->
-<div id="dashboard-screen" class="dashboard hidden">
-    <h2>Gestão Financeira Pessoal</h2>
-    
-    <div class="card"><strong>Saldo Total:</strong> <span id="saldo-val">0.00</span> Kz</div>
-    <div class="card"><strong>Reserva:</strong> <span id="reserva-val">0.00</span> Kz</div>
-    <div class="card"><strong>Economia:</strong> <span id="economia-val">0.00</span> Kz</div>
-    <div class="card"><strong>Saídas / Despesas:</strong> <span id="saidas-val">0.00</span> Kz</div>
+    <div id="dashboard-screen" class="hidden max-w-7xl mx-auto px-4 py-8 space-y-8">
+        
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-800 pb-6 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-white">Dashboard Financeiro</h1>
+                <p class="text-slate-400">Controlo de fluxos, economias e reservas</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="limparDados()" class="px-4 py-2 bg-red-900/40 hover:bg-red-900/60 text-red-300 border border-red-800 rounded-xl text-sm font-medium transition">
+                    Limpar Dados
+                </button>
+                <button onclick="logout()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium transition">
+                    Sair
+                </button>
+            </div>
+        </div>
 
-    <h3>Adicionar Transação</h3>
-    <input type="number" id="valor-input" placeholder="Valor (Kz)">
-    <select id="tipo-input" style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px;">
-        <option value="saldo">Adicionar ao Saldo Total</option>
-        <option value="reserva">Mover para Reserva</option>
-        <option value="economia">Mover para Economia</option>
-        <option value="despesa">Registrar Saída/Despesa</option>
-    </select>
-    <button class="btn" onclick="atualizarValores()">Lançar no Sistema</button>
-</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 shadow-md">
+                <p class="text-slate-400 text-sm font-medium">Saldo Total Disponível</p>
+                <p class="text-2xl font-bold text-emerald-400 mt-2"><span id="saldo-val">0.00</span> Kz</p>
+            </div>
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 shadow-md">
+                <p class="text-slate-400 text-sm font-medium">Fundo de Reserva</p>
+                <p class="text-2xl font-bold text-blue-400 mt-2"><span id="reserva-val">0.00</span> Kz</p>
+            </div>
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 shadow-md">
+                <p class="text-slate-400 text-sm font-medium">Economias Acumuladas</p>
+                <p class="text-2xl font-bold text-amber-400 mt-2"><span id="economia-val">0.00</span> Kz</p>
+            </div>
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 shadow-md">
+                <p class="text-slate-400 text-sm font-medium">Total de Saídas / Despesas</p>
+                <p class="text-2xl font-bold text-rose-400 mt-2"><span id="saidas-val">0.00</span> Kz</p>
+            </div>
+        </div>
 
-<script>
-    // Defina sua senha aqui
-    const PASSWORD_CORRETA = "1234"; 
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 space-y-4 h-fit">
+                <h3 class="text-xl font-bold text-white mb-2">Nova Operação</h3>
+                
+                <div>
+                    <label class="text-xs text-slate-400 font-semibold uppercase">Valor (Kz)</label>
+                    <input type="number" id="valor-input" placeholder="0.00" 
+                        class="w-full mt-1 px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-xl focus:outline-none focus:border-blue-500 text-white">
+                </div>
 
-    // Inicialização de dados
-    let financas = JSON.parse(localStorage.getItem('financas')) || { saldo: 0, reserva: 0, economia: 0, saidas: 0 };
+                <div>
+                    <label class="text-xs text-slate-400 font-semibold uppercase">Descrição</label>
+                    <input type="text" id="desc-input" placeholder="Ex: Salário, Supermercado..." 
+                        class="w-full mt-1 px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-xl focus:outline-none focus:border-blue-500 text-white">
+                </div>
 
-    function verificarSenha() {
-        const input = document.getElementById('password-input').value;
-        if(input === PASSWORD_CORRETA) {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('dashboard-screen').classList.remove('hidden');
+                <div>
+                    <label class="text-xs text-slate-400 font-semibold uppercase">Tipo de Movimento</label>
+                    <select id="tipo-input" class="w-full mt-1 px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-xl focus:outline-none focus:border-blue-500 text-white">
+                        <option value="saldo">Entrada direta no Saldo Total</option>
+                        <option value="reserva">Alocar para Reserva</option>
+                        <option value="economia">Alocar para Economias</option>
+                        <option value="despesa">Registrar Saída / Despesa</option>
+                    </select>
+                </div>
+
+                <button onclick="atualizarValores()" class="w-full mt-2 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition duration-200">
+                    Executar Lançamento
+                </button>
+            </div>
+
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 lg:col-span-2 flex flex-col justify-between">
+                <h3 class="text-xl font-bold text-white mb-4">Evolução & Distribuição Atual</h3>
+                <div class="relative w-full max-h-[300px] flex justify-center">
+                    <canvas id="financeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-800 rounded-2xl border border-slate-750 overflow-hidden">
+            <div class="p-6 border-b border-slate-750">
+                <h3 class="text-xl font-bold text-white">Extrato de Movimentos</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-850 text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-750">
+                            <th class="p-4">Data</th>
+                            <th class="p-4">Descrição</th>
+                            <th class="p-4">Tipo</th>
+                            <th class="p-4 text-right">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historico-corpo" class="divide-y divide-slate-750 text-sm text-slate-300">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PASSWORD_CORRETA = "1234"; 
+        let financas = JSON.parse(localStorage.getItem('financas_avancadas')) || { saldo: 0, reserva: 0, economia: 0, saidas: 0 };
+        let historico = JSON.parse(localStorage.getItem('financas_historico')) || [];
+        let chart;
+
+        function verificarSenha() {
+            const input = document.getElementById('password-input').value;
+            if(input === PASSWORD_CORRETA) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard-screen').classList.remove('hidden');
+                renderizarDados();
+                inicializarGrafico();
+            } else {
+                document.getElementById('error-msg').classList.remove('hidden');
+            }
+        }
+
+        function renderizarDados() {
+            document.getElementById('saldo-val').innerText = financas.saldo.toLocaleString('pt-PT', {minimumFractionDigits: 2});
+            document.getElementById('reserva-val').innerText = financas.reserva.toLocaleString('pt-PT', {minimumFractionDigits: 2});
+            document.getElementById('economia-val').innerText = financas.economia.toLocaleString('pt-PT', {minimumFractionDigits: 2});
+            document.getElementById('saidas-val').innerText = financas.saidas.toLocaleString('pt-PT', {minimumFractionDigits: 2});
+
+            const corpo = document.getElementById('historico-corpo');
+            corpo.innerHTML = historico.length === 0 
+                ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhum movimento registado.</td></tr>`
+                : historico.map(item => {
+                    let corTipo = item.tipo === 'despesa' ? 'text-rose-400' : 'text-emerald-400';
+                    return `<tr class="hover:bg-slate-750/40 transition">
+                        <td class="p-4 text-slate-400">${item.data}</td>
+                        <td class="p-4 font-medium text-white">${item.desc}</td>
+                        <td class="p-4"><span class="capitalize text-xs px-2.5 py-1 bg-slate-750 rounded-full">${item.tipo}</span></td>
+                        <td class="p-4 text-right font-semibold ${corTipo}">${item.valor.toLocaleString('pt-PT', {minimumFractionDigits: 2})} Kz</td>
+                    </tr>`;
+                }).join('');
+
+            if(chart) atualizarGrafico();
+        }
+
+        function atualizarValores() {
+            const valor = parseFloat(document.getElementById('valor-input').value);
+            const desc = document.getElementById('desc-input').value.trim() || 'Movimento Geral';
+            const tipo = document.getElementById('tipo-input').value;
+
+            if (isNaN(valor) || valor <= 0) return alert("Por favor, insira um valor válido.");
+
+            if (tipo === 'saldo') {
+                financas.saldo += valor;
+            } else if (tipo === 'reserva') {
+                if(financas.saldo >= valor) { financas.saldo -= valor; financas.reserva += valor; }
+                else return alert("Saldo insuficiente para mover para a Reserva.");
+            } else if (tipo === 'economia') {
+                if(financas.saldo >= valor) { financas.saldo -= valor; financas.economia += valor; }
+                else return alert("Saldo insuficiente para mover para as Economias.");
+            } else if (tipo === 'despesa') {
+                if(financas.saldo >= valor) { financas.saldo -= valor; financas.saidas += valor; }
+                else return alert("Saldo disponível insuficiente para cobrir esta despesa.");
+            }
+
+            const novaTransacao = {
+                data: new Date().toLocaleDateString('pt-PT'),
+                desc: desc,
+                tipo: tipo,
+                valor: valor
+            };
+
+            historico.unshift(novaTransacao);
+            localStorage.setItem('financas_avancadas', JSON.stringify(financas));
+            localStorage.setItem('financas_historico', JSON.stringify(historico));
+            
             renderizarDados();
-        } else {
-            document.getElementById('error-msg').style.display = 'block';
-        }
-    }
-
-    function renderizarDados() {
-        document.getElementById('saldo-val').innerText = financas.saldo.toFixed(2);
-        document.getElementById('reserva-val').innerText = financas.reserva.toFixed(2);
-        document.getElementById('economia-val').innerText = financas.economia.toFixed(2);
-        document.getElementById('saidas-val').innerText = financas.saidas.toFixed(2);
-    }
-
-    function atualizarValores() {
-        const valor = parseFloat(document.getElementById('valor-input').value);
-        const tipo = document.getElementById('tipo-input').value;
-
-        if (isNaN(valor) || valor <= 0) return alert("Insira um valor válido.");
-
-        if (tipo === 'saldo') {
-            financas.saldo += valor;
-        } else if (tipo === 'reserva') {
-            if(financas.saldo >= valor) { financas.saldo -= valor; financas.reserva += valor; }
-            else alert("Saldo insuficiente.");
-        } else if (tipo === 'economia') {
-            if(financas.saldo >= valor) { financas.saldo -= valor; financas.economia += valor; }
-            else alert("Saldo insuficiente.");
-        } else if (tipo === 'despesa') {
-            if(financas.saldo >= valor) { financas.saldo -= valor; financas.saidas += valor; }
-            else alert("Saldo insuficiente.");
+            
+            document.getElementById('valor-input').value = '';
+            document.getElementById('desc-input').value = '';
         }
 
-        localStorage.setItem('financas', JSON.stringify(financas));
-        renderizarDados();
-        document.getElementById('valor-input').value = '';
-    }
-</script>
+        function inicializarGrafico() {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Saldo Disponível', 'Reserva', 'Economias', 'Despesas Totais'],
+                    datasets: [{
+                        data: [financas.saldo, financas.reserva, financas.economia, financas.saidas],
+                        backgroundColor: ['#34d399', '#60a5fa', '#fbbf24', '#f87171'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 12 } } }
+                    }
+                }
+            });
+        }
+
+        function atualizarGrafico() {
+            chart.data.datasets[0].data = [financas.saldo, financas.reserva, financas.economia, financas.saidas];
+            chart.update();
+        }
+
+        function limparDados() {
+            if(confirm("Tem a certeza que deseja apagar todo o histórico e saldos? Esta ação não pode ser desfeita.")) {
+                localStorage.clear();
+                financas = { saldo: 0, reserva: 0, economy: 0, saidas: 0, economia: 0 };
+                historico = [];
+                renderizarDados();
+            }
+        }
+
+        function logout() {
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('password-input').value = '';
+        }
+    </script>
 </body>
 </html>
