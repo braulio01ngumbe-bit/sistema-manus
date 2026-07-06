@@ -3,202 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Manus - Dashboard Financeiro Premium</title>
+    <title>Sistema Manus - Gestão Financeira Inteligente</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome para Ícones da Barra Lateral -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js para Gráficos -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .hidden { display: none !important; }
-        .sidebar-icon:hover { color: #6b21a8; background-color: #f3e8ff; }
-        body { background-color: #f8fafc; color: #1e293b; }
+        body { transition: background-color 0.3s, color 0.3s; }
+        .dark-theme { background-color: #0f172a !important; color: #f1f5f9 !important; }
+        .dark-card { background-color: #1e293b !important; border-color: #334155 !important; color: white !important; }
+        .dark-input { background-color: #334155 !important; border-color: #475569 !important; color: white !important; }
     </style>
 </head>
-<body class="min-h-screen font-sans flex">
+<body class="min-h-screen font-sans flex bg-slate-50 text-slate-800">
 
     <!-- TELA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-100 px-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200">
             <div class="text-center mb-6">
                 <div class="w-12 h-12 bg-purple-700 rounded-xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3">
-                    <i class="fa-solid def fa-chart-simple"></i>
+                    <i class="fa-solid fa-wallet"></i>
                 </div>
                 <h2 class="text-2xl font-extrabold text-purple-900 tracking-wide">SISTEMA MANUS</h2>
-                <p class="text-slate-500 text-sm mt-1">Introduza os seus dados de acesso</p>
+                <p class="text-slate-500 text-sm mt-1">Introduza a sua password</p>
             </div>
             <div class="space-y-4">
-                <div>
-                    <label class="text-xs text-slate-500 font-semibold uppercase">Password de Acesso</label>
-                    <input type="password" id="password-input" placeholder="••••••••" 
-                        class="w-full mt-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-purple-600 text-slate-900 placeholder-slate-400">
-                </div>
-                <button onclick="verificarSenha()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition duration-200 shadow-lg shadow-purple-900/20">
-                    Entrar no Painel
+                <input type="password" id="password-input" placeholder="••••••••" 
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-purple-600 text-slate-900">
+                <button onclick="verificarSenha()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition shadow-lg">
+                    Aceder ao Painel
                 </button>
-                <p id="error-msg" class="text-red-500 text-center text-sm hidden font-medium">Password incorreta! Tente novamente.</p>
+                <p id="error-msg" class="text-red-500 text-center text-sm hidden font-medium">Password incorreta!</p>
             </div>
         </div>
     </div>
 
-    <!-- APP PRINCIPAL (Oculta antes do login) -->
+    <!-- APP PRINCIPAL -->
     <div id="app-container" class="hidden w-full flex min-h-screen">
         
-        <!-- BARRA LATERAL (SIDEBAR) -->
-        <aside class="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-6 justify-between shrink-0">
+        <!-- SIDEBAR -->
+        <aside id="sidebar-main" class="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-6 justify-between shrink-0">
             <div class="flex flex-col items-center gap-6 w-full">
-                <!-- Logo -->
-                <div class="w-10 h-10 bg-purple-700 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-md shadow-purple-200">
-                    <i class="fa-solid fa-chart-simple"></i>
+                <div class="w-10 h-10 bg-purple-700 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-md">
+                    <i class="fa-solid fa-layer-group"></i>
                 </div>
-                <!-- Botão Adicionar Rápido -->
                 <button onclick="abrirModalOperacao()" class="w-10 h-10 bg-purple-600 hover:bg-purple-700 text-white rounded-full flex items-center justify-center transition shadow-md cursor-pointer">
                     <i class="fa-solid fa-plus"></i>
                 </button>
-                
-                <!-- Menu Ícones -->
                 <nav class="flex flex-col gap-2 w-full px-2 mt-4">
                     <button class="w-full py-3 text-purple-700 bg-purple-50 rounded-xl flex items-center justify-center"><i class="fa-solid fa-house text-lg"></i></button>
-                    <button class="w-full py-3 text-slate-400 sidebar-icon rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-list-ul text-lg"></i></button>
-                    <button class="w-full py-3 text-slate-400 sidebar-icon rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-credit-card text-lg"></i></button>
-                    <button class="w-full py-3 text-slate-400 sidebar-icon rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-bullseye text-lg"></i></button>
-                    <button class="w-full py-3 text-slate-400 sidebar-icon rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-clock-rotate-left text-lg"></i></button>
+                    <button onclick="toggleTema()" class="w-full py-3 text-slate-400 hover:text-purple-600 rounded-xl flex items-center justify-center transition cursor-pointer"><i class="fa-solid fa-moon text-lg"></i></button>
                 </nav>
             </div>
-            
-            <div>
-                <button onclick="logout()" class="w-10 h-10 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
-            </div>
+            <button onclick="logout()" class="w-10 h-10 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
         </aside>
 
-        <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
-        <main class="flex-1 p-6 md:p-8 space-y-8 overflow-y-auto max-w-7xl mx-auto w-full">
+        <!-- ÁREA DE CONTEÚDO -->
+        <main class="flex-1 p-6 md:p-8 space-y-8 overflow-y-auto w-full">
             
-            <!-- TOPO DA PÁGINA (BARRA DE CONTROLOS) -->
-            <div class="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                <!-- Moedas / Pontos fictícios idênticos à imagem -->
+            <!-- CONTROLOS SUPERIORES -->
+            <div id="top-bar" class="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                 <div class="flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full text-sm font-bold border border-amber-200">
-                    <i class="fa-solid fa-coins"></i> <span>110</span>
+                    <i class="fa-solid fa-crown"></i> <span>Premium</span>
                 </div>
 
-                <!-- Seletor de Mês -->
                 <div>
                     <select id="mes-filtro" onchange="renderizarTudo()" class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 font-medium text-slate-700 focus:outline-none focus:border-purple-600 cursor-pointer">
-                        <option value="Janeiro">Janeiro</option>
-                        <option value="Fevereiro">Fevereiro</option>
-                        <option value="Março">Março</option>
-                        <option value="Abril">Abril</option>
-                        <option value="Maio">Maio</option>
-                        <option value="Junho">Junho</option>
-                        <option value="Julho" selected>Julho</option>
-                        <option value="Agosto">Agosto</option>
-                        <option value="Setembro">Setembro</option>
-                        <option value="Outubro">Outubro</option>
-                        <option value="Novembro">Novembro</option>
-                        <option value="Dezembro">Dezembro</option>
+                        <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option>
+                        <option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option>
+                        <option value="Julho" selected>Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option>
+                        <option value="Outubro">Outubro</option><option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
                     </select>
                 </div>
 
-                <!-- Perfil do Utilizador com Dropdown de Configurações -->
                 <div class="relative">
                     <button onclick="toggleMenuPerfil()" class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 p-1.5 pr-3 rounded-full transition cursor-pointer">
-                        <div class="w-8 h-8 bg-purple-200 text-purple-700 rounded-full flex items-center justify-center font-bold">
-                            M
-                        </div>
-                        <span class="text-sm font-semibold text-slate-700">Manus</span>
+                        <div class="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold" id="avatar-letra">M</div>
+                        <span class="text-sm font-semibold text-slate-700" id="user-display-name">Manus</span>
                         <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
                     </button>
-                    <!-- Menu suspenso de perfil -->
-                    <div id="perfil-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-20">
-                        <button onclick="abrirModalPassword()" class="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-                            <i class="fa-solid fa-lock text-slate-400"></i> Alterar Password
-                        </button>
+                    <div id="perfil-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-20 text-slate-800">
+                        <button onclick="abrirModalPerfil()" class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-user-gear"></i> Perfil & Segurança</button>
                         <hr class="border-slate-100 my-1">
-                        <button onclick="limparDados()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
-                            <i class="fa-solid fa-trash-can"></i> Reiniciar Sistema
-                        </button>
+                        <button onclick="limparDados()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-trash-can"></i> Reiniciar Tudo</button>
                     </div>
                 </div>
             </div>
 
-            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Dashboard</h1>
-
-            <!-- CARDS DE ENTRADAS/SAÍDAS (Idênticos ao Layout da Imagem) -->
+            <!-- CARDS DE RESUMO (Inspirados na image-8.png) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Saldo Atual -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Saldo Atual</p>
-                        <p class="text-2xl font-black text-slate-900 mt-1"><span id="card-saldo">0,00</span> Kz</p>
-                    </div>
+                <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Saldo em Contas</p><p class="text-2xl font-black mt-1"><span id="card-saldo font-bold">0,00</span> Kz</p></div>
                     <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-building-columns"></i></div>
                 </div>
-                <!-- Receitas -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Receitas</p>
-                        <p class="text-2xl font-black text-slate-900 mt-1"><span id="card-receitas">0,00</span> Kz</p>
-                    </div>
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-arrow-up"></i></div>
+                <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Receitas</p><p class="text-2xl font-black mt-1 text-emerald-600"><span id="card-receitas">0,00</span> Kz</p></div>
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-arrow-trend-up"></i></div>
                 </div>
-                <!-- Despesas -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Despesas</p>
-                        <p class="text-2xl font-black text-slate-900 mt-1"><span id="card-despesas">0,00</span> Kz</p>
-                    </div>
-                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-arrow-down"></i></div>
+                <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Despesas Totais</p><p class="text-2xl font-black mt-1 text-rose-600"><span id="card-despesas">0,00</span> Kz</p></div>
+                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-arrow-trend-down"></i></div>
                 </div>
-                <!-- Cartão de Crédito -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Cartão de Crédito</p>
-                        <p class="text-2xl font-black text-slate-900 mt-1"><span id="card-cartao">0,00</span> Kz</p>
-                    </div>
-                    <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-credit-card"></i></div>
+                <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Poupanças</p><p class="text-2xl font-black mt-1 text-purple-600"><span id="card-poupancas">0,00</span> Kz</p></div>
+                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-piggy-bank"></i></div>
                 </div>
             </div>
 
-            <!-- SECÇÃO DE GRÁFICOS (Alinhamento Horizontal da Imagem) -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Despesas por Categoria -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4">Despesas por categoria</h3>
-                    <div class="relative w-full h-64 flex justify-center items-center">
-                        <canvas id="chartCategorias"></canvas>
+            <!-- ESTRUTURA BANCOS & INDICADORES -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Controlo de Contas / Bancos -->
+                <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-1">
+                    <h3 class="text-lg font-bold mb-4 flex items-center justify-between"><span>As Minhas Contas / Cartões</span></h3>
+                    <div class="space-y-3" id="lista-bancos">
+                        <!-- Gerado por JS -->
                     </div>
                 </div>
-
-                <!-- Balanço Mensal -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4">Balanço mensal</h3>
-                    <div class="relative w-full h-64 flex justify-center items-center">
-                        <canvas id="chartBalanco"></canvas>
+                
+                <!-- Indicadores Financeiros Avançados -->
+                <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2">
+                    <h3 class="text-lg font-bold mb-4">Indicadores Financeiros & Desempenho</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 text-center card-alvo">
+                            <p class="text-xs text-slate-400 font-bold uppercase">Taxa de Poupança</p>
+                            <p class="text-xl font-black mt-2 text-purple-600" id="ind-poupanca">0%</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 text-center card-alvo">
+                            <p class="text-xs text-slate-400 font-bold uppercase">Eficiência de Gastos</p>
+                            <p class="text-xl font-black mt-2 text-blue-600" id="ind-eficiencia">0%</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 text-center card-alvo">
+                            <p class="text-xs text-slate-400 font-bold uppercase">Status de Balanço</p>
+                            <p class="text-sm font-bold mt-3 px-2 py-1 rounded-full bg-slate-200 inline-block" id="ind-status">Sem Dados</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- HISTÓRICO / EXTRATO DE MOVIMENTOS -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <!-- ANÁLISE GRÁFICA -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-80 flex flex-col justify-between">
+                    <h3 class="text-md font-bold text-slate-500 uppercase tracking-wider mb-2">Distribuição de Despesas</h3>
+                    <div class="relative w-full h-full flex items-center justify-center"><canvas id="chartCategorias"></canvas></div>
+                </div>
+                <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-80 flex flex-col justify-between">
+                    <h3 class="text-md font-bold text-slate-500 uppercase tracking-wider mb-2">Balanço Mensal</h3>
+                    <div class="relative w-full h-full flex items-center justify-center"><canvas id="chartBalanco"></canvas></div>
+                </div>
+            </div>
+
+            <!-- EXTRATO -->
+            <div class="card-alvo bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-slate-800">Histórico de Transações</h3>
-                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider" id="extrato-mes-nome">Julho</span>
+                    <h3 class="text-lg font-bold">Histórico Geral de Transações</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                            <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-xs font-bold uppercase tracking-wider card-alvo">
                                 <th class="p-4">Data</th>
                                 <th class="p-4">Descrição</th>
+                                <th class="p-4">Conta/Meio</th>
                                 <th class="p-4">Categoria</th>
-                                <th class="p-4">Meio</th>
                                 <th class="p-4 text-right">Valor</th>
                             </tr>
                         </thead>
-                        <tbody id="tabela-corpo" class="divide-y divide-slate-100 text-sm font-medium text-slate-600">
-                            <!-- JS Injeta Dados Aqui -->
-                        </tbody>
+                        <tbody id="tabela-corpo" class="divide-y divide-slate-100 text-sm font-medium"></tbody>
                     </table>
                 </div>
             </div>
@@ -207,256 +180,269 @@
 
     <!-- MODAL: NOVA OPERAÇÃO -->
     <div id="modal-operacao" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden">
+        <div class="bg-white rounded-2xl border w-full max-w-md overflow-hidden card-alvo">
             <div class="bg-purple-700 p-4 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg"><i class="fa-solid fa-plus mr-2"></i>Nova Transação</h3>
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-plus mr-2"></i>Registar Movimento</h3>
                 <button onclick="fecharModalOperacao()" class="text-white/80 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase">Valor (Kz)</label>
-                    <input type="number" id="op-valor" placeholder="0.00" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Valor (Kz)</label>
+                    <input type="number" id="op-valor" placeholder="0.00" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase">Descrição</label>
-                    <input type="text" id="op-desc" placeholder="Ex: Salário, Supermercado" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Descrição</label>
+                    <input type="text" id="op-desc" placeholder="Ex: Salário Mençal, Compras" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase">Tipo</label>
-                    <select id="op-tipo" onchange="ajustarCategorias()" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
-                        <option value="receita">Receita (Entrada)</option>
-                        <option value="despesa">Despesa (Saída no Dinheiro/Conta)</option>
-                        <option value="cartao">Despesa no Cartão de Crédito</option>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Fluxo</label>
+                    <select id="op-tipo" onchange="ajustarFormulario()" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl input-alvo">
+                        <option value="receita">Receita (+ Balance)</option>
+                        <option value="despesa">Despesa (- Balance)</option>
+                        <option value="poupanca">Destinar a Poupança / Reserva</option>
                     </select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase">Categoria</label>
-                    <select id="op-categoria" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
-                        <!-- Gerado via JS dependendo do tipo -->
-                    </select>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Conta / Origem-Destino</label>
+                    <select id="op-banco" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl input-alvo"></select>
                 </div>
-                <button onclick="salvarOperacao()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition">
-                    Confirmar Lançamento
-                </button>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Categoria</label>
+                    <select id="op-categoria" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl input-alvo"></select>
+                </div>
+                <button onclick="salvarOperacao()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition cursor-pointer">Confirmar Lançamento</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: ALTERAÇÃO DE PASSWORD -->
-    <div id="modal-password" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden">
+    <!-- MODAL: PERFIL & SEGURANÇA -->
+    <div id="modal-perfil" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-2xl border w-full max-w-md overflow-hidden card-alvo">
             <div class="bg-slate-900 p-4 text-white flex justify-between items-center">
-                <h3 class="font-bold"><i class="fa-solid fa-key mr-2"></i>Alterar Password de Segurança</h3>
-                <button onclick="fecharModalPassword()" class="text-white/80 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold"><i class="fa-solid fa-user-gear mr-2"></i>Gestão de Perfil</h3>
+                <button onclick="fecharModalPerfil()" class="text-white/80 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase">Password Atual</label>
-                    <input type="password" id="pw-atual" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Nome do Utilizador</label>
+                    <input type="text" id="prof-nome" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase">Nova Password</label>
-                    <input type="password" id="pw-nova" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Password Atual</label>
+                    <input type="password" id="prof-pw-atual" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
                 </div>
-                <button onclick="confirmarNovaPassword()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition">
-                    Atualizar Password
-                </button>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Nova Password</label>
+                    <input type="password" id="prof-pw-nova" placeholder="Deixe em branco para não alterar" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
+                </div>
+                <button onclick="salvarConfigPerfil()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition cursor-pointer">Guardar Alterações</button>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JS ENGINE -->
     <script>
-        let db = JSON.parse(localStorage.getItem('manus_premium_db')) || {
+        let db = JSON.parse(localStorage.getItem('manus_finance_v3')) || {
             password: "1234",
-            movimentos: []
+            userName: "Manus",
+            theme: "light",
+            movimentos: [],
+            saldosBancos: { "Conta Caixa": 0, "Banco BAI": 0, "Banco BFA": 0, "Cartão Multicaixa": 0, "Cartão Crédito": 0 }
         };
 
         let chart1, chart2;
 
         function verificarSenha() {
-            const input = document.getElementById('password-input').value;
-            if (input === db.password) {
+            if (document.getElementById('password-input').value === db.password) {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
-                ajustarCategorias();
+                aplicarTemaAtual();
+                ajustarFormulario();
                 renderizarTudo();
             } else {
                 document.getElementById('error-msg').classList.remove('hidden');
             }
         }
 
-        function toggleMenuPerfil() {
-            document.getElementById('perfil-dropdown').classList.toggle('hidden');
+        function aplicarTemaAtual() {
+            const isDark = db.theme === 'dark';
+            document.body.classList.toggle('dark-theme', isDark);
+            document.getElementById('sidebar-main').classList.toggle('dark-card', isDark);
+            document.getElementById('top-bar').classList.toggle('dark-card', isDark);
+            document.querySelectorAll('.card-alvo').forEach(c => c.classList.toggle('dark-card', isDark));
+            document.querySelectorAll('.input-alvo').forEach(i => i.classList.toggle('dark-input', isDark));
+            document.getElementById('perfil-dropdown').classList.toggle('dark-card', isDark);
         }
 
+        function toggleTema() {
+            db.theme = db.theme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('manus_finance_v3', JSON.stringify(db));
+            aplicarTemaAtual();
+            renderizarTudo();
+        }
+
+        function toggleMenuPerfil() { document.getElementById('perfil-dropdown').classList.toggle('hidden'); }
         function abrirModalOperacao() { document.getElementById('modal-operacao').classList.remove('hidden'); }
         function fecharModalOperacao() { document.getElementById('modal-operacao').classList.add('hidden'); }
-        function abrirModalPassword() { 
+        function abrirModalPerfil() {
             document.getElementById('perfil-dropdown').classList.add('hidden');
-            document.getElementById('modal-password').classList.remove('hidden'); 
+            document.getElementById('prof-nome').value = db.userName;
+            document.getElementById('modal-perfil').classList.remove('hidden');
         }
-        function fecharModalPassword() { document.getElementById('modal-password').classList.add('hidden'); }
+        function fecharModalPerfil() { document.getElementById('modal-perfil').classList.add('hidden'); }
 
-        function ajustarCategorias() {
+        function ajustarFormulario() {
             const tipo = document.getElementById('op-tipo').value;
-            const catSelect = document.getElementById('op-categoria');
-            catSelect.innerHTML = '';
+            const bSelect = document.getElementById('op-banco');
+            const cSelect = document.getElementById('op-categoria');
             
-            if (tipo === 'receita') {
-                catSelect.innerHTML = `<option value="Salário">Salário</option><option value="Investimentos">Investimentos</option><option value="Outros">Outros</option>`;
+            bSelect.innerHTML = Object.keys(db.saldosBancos).map(b => `<option value="${b}">${b}</option>`).join('');
+            
+            if(tipo === 'receita') {
+                cSelect.innerHTML = '<option value="Salário">Salário</option><option value="Negócios">Negócios</option><option value="Outros">Outros</option>';
+            } else if(tipo === 'despesa') {
+                cSelect.innerHTML = '<option value="Alimentação">Alimentação</option><option value="Casa">Casa</option><option value="Educação">Educação</option><option value="Impostos/Taxas">Impostos/Taxas</option><option value="Outros">Outros</option>';
             } else {
-                catSelect.innerHTML = `<option value="Alimentação">Alimentação</option><option value="Casa">Casa</option><option value="Educação">Educação</option><option value="Lazer">Lazer</option><option value="Outros">Outros</option>`;
+                cSelect.innerHTML = '<option value="Fundo de Emergência">Fundo de Emergência</option><option value="Investimentos Longo Prazo">Investimentos</option>';
             }
         }
 
         function salvarOperacao() {
             const valor = parseFloat(document.getElementById('op-valor').value);
-            const desc = document.getElementById('op-desc').value.trim() || 'Movimento Geral';
+            const desc = document.getElementById('op-desc').value.trim() || 'Movimento';
             const tipo = document.getElementById('op-tipo').value;
+            const banco = document.getElementById('op-banco').value;
             const categoria = document.getElementById('op-categoria').value;
-            const mesCorrente = document.getElementById('mes-filtro').value;
+            const mes = document.getElementById('mes-filtro').value;
 
-            if (isNaN(valor) || valor <= 0) return alert("Insira um valor válido.");
+            if (isNaN(valor) || valor <= 0) return alert("Insira um valor.");
 
-            db.movimentos.unshift({
-                id: Date.now(),
-                data: new Date().toLocaleDateString('pt-PT'),
-                mes: mesCorrente,
-                desc: desc,
-                tipo: tipo,
-                categoria: categoria,
-                valor: valor
-            });
-
-            localStorage.setItem('manus_premium_db', JSON.stringify(db));
+            db.movimentos.unshift({ id: Date.now(), data: new Date().toLocaleDateString('pt-PT'), mes, desc, tipo, banco, categoria, valor });
+            localStorage.setItem('manus_finance_v3', JSON.stringify(db));
             fecharModalOperacao();
             renderizarTudo();
-
             document.getElementById('op-valor').value = '';
             document.getElementById('op-desc').value = '';
         }
 
         function renderizarTudo() {
-            const mesSelecionado = document.getElementById('mes-filtro').value;
-            document.getElementById('extrato-mes-nome').innerText = mesSelecionado;
+            document.getElementById('user-display-name').innerText = db.userName;
+            document.getElementById('avatar-letra').innerText = db.userName.charAt(0).toUpperCase();
+            
+            const mesSel = document.getElementById('mes-filtro').value;
+            const dadosMes = db.movimentos.filter(m => m.mes === mesSel);
 
-            // Filtrar movimentos do mês selecionado
-            const dadosMes = db.movimentos.filter(m => m.mes === mesSelecionado);
+            // Reset saldos estruturais base
+            let saldosConstruidos = { "Conta Caixa": 0, "Banco BAI": 0, "Banco BFA": 0, "Cartão Multicaixa": 0, "Cartão Crédito": 0 };
+            let receitas = 0, despesas = 0, poupancas = 0;
+            let categoriasMapa = { Alimentação: 0, Casa: 0, Educação: 0, "Impostos/Taxas": 0, Outros: 0 };
 
-            let saldoTotal = 0, receitas = 0, despesas = 0, cartao = 0;
-            let catValores = { Alimentação: 0, Casa: 0, Educação: 0, Lazer: 0, Outros: 0 };
-
-            dadosMes.forEach(m => {
-                if (m.tipo === 'receita') {
-                    receitas += m.valor;
-                    saldoTotal += m.valor;
-                } else if (m.tipo === 'despesa') {
-                    despesas += m.valor;
-                    saldoTotal -= m.valor;
-                    if (catValores[m.categoria] !== undefined) catValores[m.categoria] += m.valor;
-                } else if (m.tipo === 'cartao') {
-                    cartao += m.valor;
-                    if (catValores[m.categoria] !== undefined) catValores[m.categoria] += m.valor;
-                }
+            // Processamento histórico completo para saldos cumulativos corretos
+            db.movimentos.forEach(m => {
+                if(m.tipo === 'receita') saldosConstruidos[m.banco] += m.valor;
+                if(m.tipo === 'despesa') saldosConstruidos[m.banco] -= m.valor;
+                if(m.tipo === 'poupanca') saldosConstruidos[m.banco] -= m.valor;
             });
 
-            // Atualizar Cards Visuais
-            document.getElementById('card-saldo').innerText = saldoTotal.toLocaleString('pt-PT', {minimumFractionDigits:2});
+            // Processamento exclusivo do mês selecionado para KPIs e gráficos
+            dadosMes.forEach(m => {
+                if(m.tipo === 'receita') receitas += m.valor;
+                if(m.tipo === 'despesa') { despesas += m.valor; if(categoriasMapa[m.categoria] !== undefined) categoriasMapa[m.categoria] += m.valor; }
+                if(m.tipo === 'poupanca') poupancas += m.valor;
+            });
+
+            let saldoTotalContas = Object.values(saldosConstruidos).reduce((a, b) => a + b, 0);
+
+            // Injetar nos cards
+            document.getElementById('card-saldo font-bold').innerText = saldoTotalContas.toLocaleString('pt-PT', {minimumFractionDigits:2});
             document.getElementById('card-receitas').innerText = receitas.toLocaleString('pt-PT', {minimumFractionDigits:2});
             document.getElementById('card-despesas').innerText = despesas.toLocaleString('pt-PT', {minimumFractionDigits:2});
-            document.getElementById('card-cartao').innerText = cartao.toLocaleString('pt-PT', {minimumFractionDigits:2});
+            document.getElementById('card-poupancas').innerText = poupancas.toLocaleString('pt-PT', {minimumFractionDigits:2});
 
-            // Gerar Histórico na Tabela
+            // Listar Bancos estruturalmente
+            document.getElementById('lista-bancos').innerHTML = Object.keys(saldosConstruidos).map(b => {
+                let s = saldosConstruidos[b];
+                return `<div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-50/50 card-alvo">
+                    <span class="text-sm font-semibold"><i class="fa-solid fa-money-check-dollar text-purple-600 mr-2"></i>${b}</span>
+                    <span class="font-bold ${s >= 0 ? 'text-slate-700' : 'text-red-500'}">${s.toLocaleString('pt-PT', {minimumFractionDigits:2})} Kz</span>
+                </div>`;
+            }).join('');
+
+            // Indicadores
+            let txPoup = receitas > 0 ? Math.round((poupancas / receitas) * 100) : 0;
+            let txEfic = receitas > 0 ? Math.round(((receitas - despesas) / receitas) * 100) : 0;
+            document.getElementById('ind-poupanca').innerText = `${txPoup}%`;
+            document.getElementById('ind-eficiencia').innerText = `${txEfic}%`;
+            
+            const indStatus = document.getElementById('ind-status');
+            if(receitas === 0 && despesas === 0) { indStatus.innerText = "Sem Dados"; indStatus.className = "text-sm font-bold mt-3 px-2 py-1 rounded-full bg-slate-200 inline-block text-slate-700"; }
+            else if(receitas >= despesas) { indStatus.innerText = "Superavitário"; indStatus.className = "text-sm font-bold mt-3 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700"; }
+            else { indStatus.innerText = "Deficitário"; indStatus.className = "text-sm font-bold mt-3 px-3 py-1 rounded-full bg-rose-100 text-rose-700"; }
+
+            // Tabela
             const corpo = document.getElementById('tabela-corpo');
-            if (dadosMes.length === 0) {
-                corpo.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 font-normal">Nenhum registo efetuado para o mês de ${mesSelecionado}.</td></tr>`;
+            if(dadosMes.length === 0) {
+                corpo.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Sem registos em ${mesSel}.</td></tr>`;
             } else {
                 corpo.innerHTML = dadosMes.map(m => {
-                    let cor = m.tipo === 'receita' ? 'text-emerald-600' : (m.tipo === 'cartao' ? 'text-teal-600' : 'text-rose-600');
-                    let sinal = m.tipo === 'receita' ? '+' : '-';
-                    let meio = m.tipo === 'receita' ? 'Dinheiro/Conta' : (m.tipo === 'cartao' ? 'Cartão Crédito' : 'Dinheiro/Conta');
-                    return `<tr class="hover:bg-slate-50/80 transition">
-                        <td class="p-4 text-slate-400">${m.data}</td>
-                        <td class="p-4 text-slate-900 font-bold">${m.desc}</td>
-                        <td class="p-4"><span class="px-2.5 py-1 bg-slate-100 rounded-full text-xs text-slate-600">${m.categoria}</span></td>
-                        <td class="p-4 text-xs text-slate-400">${meio}</td>
-                        <td class="p-4 text-right font-black ${cor}">${sinal} ${m.valor.toLocaleString('pt-PT', {minimumFractionDigits:2})} Kz</td>
+                    let cor = m.tipo === 'receita' ? 'text-emerald-600' : (m.tipo === 'poupanca' ? 'text-purple-600' : 'text-rose-600');
+                    return `<tr class="hover:bg-slate-50/40 transition">
+                        <td class="p-4 text-slate-400 text-xs">${m.data}</td>
+                        <td class="p-4 font-bold">${m.desc}</td>
+                        <td class="p-4 text-xs text-slate-400">${m.banco}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 bg-purple-50 text-purple-700 text-xs rounded-full font-bold">${m.categoria}</span></td>
+                        <td class="p-4 text-right font-black ${cor}">${m.tipo==='receita'?'+':'-'} ${m.valor.toLocaleString('pt-PT', {minimumFractionDigits:2})} Kz</td>
                     </tr>`;
                 }).join('');
             }
 
-            // Atualizar Gráficos
-            atualizarGraficosVisuais(catValores, receitas, despesas, saldoTotal);
+            atualizarGraficos(categoriasMapa, receitas, despesas, (receitas-despesas));
         }
 
-        function atualizarGraficosVisuais(cat, rec, desp, bal) {
-            // Destruir gráficos anteriores para evitar sobreposição
+        function atualizarGraficos(cat, rec, desp, bal) {
             if(chart1) chart1.destroy();
             if(chart2) chart2.destroy();
+            const dark = db.theme === 'dark';
+            const corTexto = dark ? '#f1f5f9' : '#334155';
 
-            // 1. Gráfico de Rosca (Categorias)
-            const ctx1 = document.getElementById('chartCategorias').getContext('2d');
-            chart1 = new Chart(ctx1, {
+            chart1 = new Chart(document.getElementById('chartCategorias').getContext('2d'), {
                 type: 'doughnut',
-                data: {
-                    labels: Object.keys(cat),
-                    datasets: [{
-                        data: Object.values(cat),
-                        backgroundColor: ['#a855f7', '#0284c7', '#f59e0b', '#ec4899', '#64748b'],
-                        borderWidth: 2
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                data: { labels: Object.keys(cat), datasets: [{ data: Object.values(cat), backgroundColor: ['#a855f7', '#3b82f6', '#eab308', '#ef4444', '#64748b'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: corTexto } } } }
             });
 
-            // 2. Gráfico de Barras (Balanço Mensal)
-            const ctx2 = document.getElementById('chartBalanco').getContext('2d');
-            chart2 = new Chart(ctx2, {
+            chart2 = new Chart(document.getElementById('chartBalanco').getContext('2d'), {
                 type: 'bar',
-                data: {
-                    labels: ['Receitas', 'Despesas', 'Balanço'],
-                    datasets: [{
-                        label: 'Valores em Kz',
-                        data: [rec, desp, bal],
-                        backgroundColor: ['#10b981', '#f43f5e', '#6366f1'],
-                        borderRadius: 8
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                data: { labels: ['Receitas', 'Despesas', 'Balanço'], datasets: [{ data: [rec, desp, bal], backgroundColor: ['#10b981', '#f43f5e', '#6366f1'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: corTexto } }, x: { ticks: { color: corTexto } } } }
             });
         }
 
-        function confirmarNovaPassword() {
-            const atual = document.getElementById('pw-atual').value;
-            const nova = document.getElementById('pw-nova').value.trim();
+        function salvarConfigPerfil() {
+            const nome = document.getElementById('prof-nome').value.trim();
+            const atual = document.getElementById('prof-pw-atual').value;
+            const nova = document.getElementById('prof-pw-nova').value.trim();
 
-            if (atual !== db.password) return alert("A password atual introduzida está errada!");
-            if (nova.length < 4) return alert("A nova password deve conter pelo menos 4 caracteres.");
+            if (atual !== db.password) return alert("Password atual incorreta!");
+            if (nome.length < 2) return alert("Insira um nome válido.");
 
-            db.password = nova;
-            localStorage.setItem('manus_premium_db', JSON.stringify(db));
-            alert("Password alterada com sucesso!");
-            fecharModalPassword();
-            document.getElementById('pw-atual').value = '';
-            document.getElementById('pw-nova').value = '';
+            db.userName = nome;
+            if(nova.length >= 4) db.password = nova;
+
+            localStorage.setItem('manus_finance_v3', JSON.stringify(db));
+            alert("Perfil atualizado com sucesso!");
+            fecharModalPerfil();
+            renderizarTudo();
         }
 
         function limparDados() {
-            if(confirm("Deseja redefinir todo o sistema? Perderá todos os lançamentos registados.")) {
-                localStorage.removeItem('manus_premium_db');
-                db = { password: "1234", movimentos: [] };
-                renderizarTudo();
-                document.getElementById('perfil-dropdown').classList.add('hidden');
+            if(confirm("Deseja apagar todos os dados e reiniciar?")) {
+                localStorage.removeItem('manus_finance_v3');
+                location.reload();
             }
         }
 
-        function logout() {
-            document.getElementById('app-container').classList.add('hidden');
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('password-input').value = '';
-            document.getElementById('perfil-dropdown').classList.add('hidden');
-        }
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
