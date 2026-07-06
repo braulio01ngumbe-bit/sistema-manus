@@ -3,245 +3,459 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Manus - Gestão Financeira Avançada</title>
+    <title>Sistema Manus - Dashboard Financeiro Premium</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome para Ícones da Barra Lateral -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para Gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .hidden { display: none !important; }
+        .sidebar-icon:hover { color: #6b21a8; background-color: #f3e8ff; }
+        body { background-color: #f8fafc; color: #1e293b; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+<body class="min-h-screen font-sans flex">
 
-    <div id="login-screen" class="flex items-center justify-center min-h-screen px-4">
-        <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-100 px-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200">
             <div class="text-center mb-6">
-                <h2 class="text-3xl font-extrabold text-blue-500 tracking-wide">SISTEMA MANUS</h2>
-                <p class="text-slate-400 text-sm mt-2">Gestão Financeira Pessoal & Familiar</p>
+                <div class="w-12 h-12 bg-purple-700 rounded-xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3">
+                    <i class="fa-solid def fa-chart-simple"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold text-purple-900 tracking-wide">SISTEMA MANUS</h2>
+                <p class="text-slate-500 text-sm mt-1">Introduza os seus dados de acesso</p>
             </div>
             <div class="space-y-4">
-                <input type="password" id="password-input" placeholder="Introduza a sua password" 
-                    class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl focus:outline-none focus:border-blue-500 text-white placeholder-slate-400">
-                <button onclick="verificarSenha()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition duration-200 shadow-lg shadow-blue-900/40">
-                    Aceder ao Painel
+                <div>
+                    <label class="text-xs text-slate-500 font-semibold uppercase">Password de Acesso</label>
+                    <input type="password" id="password-input" placeholder="••••••••" 
+                        class="w-full mt-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-purple-600 text-slate-900 placeholder-slate-400">
+                </div>
+                <button onclick="verificarSenha()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition duration-200 shadow-lg shadow-purple-900/20">
+                    Entrar no Painel
                 </button>
-                <p id="error-msg" class="text-red-400 text-center text-sm hidden font-medium">Password incorreta! Tente novamente.</p>
+                <p id="error-msg" class="text-red-500 text-center text-sm hidden font-medium">Password incorreta! Tente novamente.</p>
             </div>
         </div>
     </div>
 
-    <div id="dashboard-screen" class="hidden max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <!-- APP PRINCIPAL (Oculta antes do login) -->
+    <div id="app-container" class="hidden w-full flex min-h-screen">
         
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-800 pb-6 gap-4">
-            <div>
-                <h1 class="text-3xl font-bold text-white">Dashboard Financeiro</h1>
-                <p class="text-slate-400">Controlo de fluxos, economias e reservas</p>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="limparDados()" class="px-4 py-2 bg-red-900/40 hover:bg-red-900/60 text-red-300 border border-red-800 rounded-xl text-sm font-medium transition">
-                    Limpar Dados
+        <!-- BARRA LATERAL (SIDEBAR) -->
+        <aside class="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-6 justify-between shrink-0">
+            <div class="flex flex-col items-center gap-6 w-full">
+                <!-- Logo -->
+                <div class="w-10 h-10 bg-purple-700 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-md shadow-purple-200">
+                    <i class="fa-solid fa-chart-simple"></i>
+                </div>
+                <!-- Botão Adicionar Rápido -->
+                <button onclick="abrirModalOperacao()" class="w-10 h-10 bg-purple-600 hover:bg-purple-700 text-white rounded-full flex items-center justify-center transition shadow-md cursor-pointer">
+                    <i class="fa-solid fa-plus"></i>
                 </button>
-                <button onclick="logout()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium transition">
-                    Sair
-                </button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 shadow-md">
-                <p class="text-slate-400 text-sm font-medium">Saldo Total Disponível</p>
-                <p class="text-2xl font-bold text-emerald-400 mt-2"><span id="saldo-val">0.00</span> Kz</p>
-            </div>
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 shadow-md">
-                <p class="text-slate-400 text-sm font-medium">Fundo de Reserva</p>
-                <p class="text-2xl font-bold text-blue-400 mt-2"><span id="reserva-val">0.00</span> Kz</p>
-            </div>
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 shadow-md">
-                <p class="text-slate-400 text-sm font-medium">Economias Acumuladas</p>
-                <p class="text-2xl font-bold text-amber-400 mt-2"><span id="economia-val">0.00</span> Kz</p>
-            </div>
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 shadow-md">
-                <p class="text-slate-400 text-sm font-medium">Total de Saídas / Despesas</p>
-                <p class="text-2xl font-bold text-rose-400 mt-2"><span id="saidas-val">0.00</span> Kz</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 space-y-4 h-fit">
-                <h3 class="text-xl font-bold text-white mb-2">Nova Operação</h3>
                 
-                <div>
-                    <label class="text-xs text-slate-400 font-semibold uppercase">Valor (Kz)</label>
-                    <input type="number" id="valor-input" placeholder="0.00" 
-                        class="w-full mt-1 px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-xl focus:outline-none focus:border-blue-500 text-white">
+                <!-- Menu Ícones -->
+                <nav class="flex flex-col gap-2 w-full px-2 mt-4">
+                    <button class="w-full py-3 text-purple-700 bg-purple-50 rounded-xl flex items-center justify-center"><i class="fa-solid fa-house text-lg"></i></button>
+                    <button class="w-full py-3 text-slate-400 sidebar-icon rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-list-ul text-lg"></i></button>
+                    <button class="w-full py-3 text-slate-400 sidebar-icon rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-credit-card text-lg"></i></button>
+                    <button class="w-full py-3 text-slate-400 sidebar-icon rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-bullseye text-lg"></i></button>
+                    <button class="w-full py-3 text-slate-400 sidebar-icon rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-clock-rotate-left text-lg"></i></button>
+                </nav>
+            </div>
+            
+            <div>
+                <button onclick="logout()" class="w-10 h-10 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
+            </div>
+        </aside>
+
+        <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+        <main class="flex-1 p-6 md:p-8 space-y-8 overflow-y-auto max-w-7xl mx-auto w-full">
+            
+            <!-- TOPO DA PÁGINA (BARRA DE CONTROLOS) -->
+            <div class="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <!-- Moedas / Pontos fictícios idênticos à imagem -->
+                <div class="flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full text-sm font-bold border border-amber-200">
+                    <i class="fa-solid fa-coins"></i> <span>110</span>
                 </div>
 
+                <!-- Seletor de Mês -->
                 <div>
-                    <label class="text-xs text-slate-400 font-semibold uppercase">Descrição</label>
-                    <input type="text" id="desc-input" placeholder="Ex: Salário, Supermercado..." 
-                        class="w-full mt-1 px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-xl focus:outline-none focus:border-blue-500 text-white">
-                </div>
-
-                <div>
-                    <label class="text-xs text-slate-400 font-semibold uppercase">Tipo de Movimento</label>
-                    <select id="tipo-input" class="w-full mt-1 px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-xl focus:outline-none focus:border-blue-500 text-white">
-                        <option value="saldo">Entrada direta no Saldo Total</option>
-                        <option value="reserva">Alocar para Reserva</option>
-                        <option value="economia">Alocar para Economias</option>
-                        <option value="despesa">Registrar Saída / Despesa</option>
+                    <select id="mes-filtro" onchange="renderizarTudo()" class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 font-medium text-slate-700 focus:outline-none focus:border-purple-600 cursor-pointer">
+                        <option value="Janeiro">Janeiro</option>
+                        <option value="Fevereiro">Fevereiro</option>
+                        <option value="Março">Março</option>
+                        <option value="Abril">Abril</option>
+                        <option value="Maio">Maio</option>
+                        <option value="Junho">Junho</option>
+                        <option value="Julho" selected>Julho</option>
+                        <option value="Agosto">Agosto</option>
+                        <option value="Setembro">Setembro</option>
+                        <option value="Outubro">Outubro</option>
+                        <option value="Novembro">Novembro</option>
+                        <option value="Dezembro">Dezembro</option>
                     </select>
                 </div>
 
-                <button onclick="atualizarValores()" class="w-full mt-2 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition duration-200">
-                    Executar Lançamento
-                </button>
-            </div>
-
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-750 lg:col-span-2 flex flex-col justify-between">
-                <h3 class="text-xl font-bold text-white mb-4">Evolução & Distribuição Atual</h3>
-                <div class="relative w-full max-h-[300px] flex justify-center">
-                    <canvas id="financeChart"></canvas>
+                <!-- Perfil do Utilizador com Dropdown de Configurações -->
+                <div class="relative">
+                    <button onclick="toggleMenuPerfil()" class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 p-1.5 pr-3 rounded-full transition cursor-pointer">
+                        <div class="w-8 h-8 bg-purple-200 text-purple-700 rounded-full flex items-center justify-center font-bold">
+                            M
+                        </div>
+                        <span class="text-sm font-semibold text-slate-700">Manus</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                    </button>
+                    <!-- Menu suspenso de perfil -->
+                    <div id="perfil-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-20">
+                        <button onclick="abrirModalPassword()" class="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                            <i class="fa-solid fa-lock text-slate-400"></i> Alterar Password
+                        </button>
+                        <hr class="border-slate-100 my-1">
+                        <button onclick="limparDados()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                            <i class="fa-solid fa-trash-can"></i> Reiniciar Sistema
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="bg-slate-800 rounded-2xl border border-slate-750 overflow-hidden">
-            <div class="p-6 border-b border-slate-750">
-                <h3 class="text-xl font-bold text-white">Extrato de Movimentos</h3>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Dashboard</h1>
+
+            <!-- CARDS DE ENTRADAS/SAÍDAS (Idênticos ao Layout da Imagem) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Saldo Atual -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Saldo Atual</p>
+                        <p class="text-2xl font-black text-slate-900 mt-1"><span id="card-saldo">0,00</span> Kz</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-building-columns"></i></div>
+                </div>
+                <!-- Receitas -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Receitas</p>
+                        <p class="text-2xl font-black text-slate-900 mt-1"><span id="card-receitas">0,00</span> Kz</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-arrow-up"></i></div>
+                </div>
+                <!-- Despesas -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Despesas</p>
+                        <p class="text-2xl font-black text-slate-900 mt-1"><span id="card-despesas">0,00</span> Kz</p>
+                    </div>
+                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-arrow-down"></i></div>
+                </div>
+                <!-- Cartão de Crédito -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Cartão de Crédito</p>
+                        <p class="text-2xl font-black text-slate-900 mt-1"><span id="card-cartao">0,00</span> Kz</p>
+                    </div>
+                    <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-credit-card"></i></div>
+                </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-850 text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-750">
-                            <th class="p-4">Data</th>
-                            <th class="p-4">Descrição</th>
-                            <th class="p-4">Tipo</th>
-                            <th class="p-4 text-right">Valor</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historico-corpo" class="divide-y divide-slate-750 text-sm text-slate-300">
+
+            <!-- SECÇÃO DE GRÁFICOS (Alinhamento Horizontal da Imagem) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Despesas por Categoria -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">Despesas por categoria</h3>
+                    <div class="relative w-full h-64 flex justify-center items-center">
+                        <canvas id="chartCategorias"></canvas>
+                    </div>
+                </div>
+
+                <!-- Balanço Mensal -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">Balanço mensal</h3>
+                    <div class="relative w-full h-64 flex justify-center items-center">
+                        <canvas id="chartBalanco"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTÓRICO / EXTRATO DE MOVIMENTOS -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-slate-800">Histórico de Transações</h3>
+                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider" id="extrato-mes-nome">Julho</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                                <th class="p-4">Data</th>
+                                <th class="p-4">Descrição</th>
+                                <th class="p-4">Categoria</th>
+                                <th class="p-4">Meio</th>
+                                <th class="p-4 text-right">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-corpo" class="divide-y divide-slate-100 text-sm font-medium text-slate-600">
+                            <!-- JS Injeta Dados Aqui -->
                         </tbody>
-                </table>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: NOVA OPERAÇÃO -->
+    <div id="modal-operacao" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden">
+            <div class="bg-purple-700 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-plus mr-2"></i>Nova Transação</h3>
+                <button onclick="fecharModalOperacao()" class="text-white/80 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Valor (Kz)</label>
+                    <input type="number" id="op-valor" placeholder="0.00" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Descrição</label>
+                    <input type="text" id="op-desc" placeholder="Ex: Salário, Supermercado" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Tipo</label>
+                    <select id="op-tipo" onchange="ajustarCategorias()" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
+                        <option value="receita">Receita (Entrada)</option>
+                        <option value="despesa">Despesa (Saída no Dinheiro/Conta)</option>
+                        <option value="cartao">Despesa no Cartão de Crédito</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Categoria</label>
+                    <select id="op-categoria" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
+                        <!-- Gerado via JS dependendo do tipo -->
+                    </select>
+                </div>
+                <button onclick="salvarOperacao()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition">
+                    Confirmar Lançamento
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL: ALTERAÇÃO DE PASSWORD -->
+    <div id="modal-password" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden">
+            <div class="bg-slate-900 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold"><i class="fa-solid fa-key mr-2"></i>Alterar Password de Segurança</h3>
+                <button onclick="fecharModalPassword()" class="text-white/80 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Password Atual</label>
+                    <input type="password" id="pw-atual" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Nova Password</label>
+                    <input type="password" id="pw-nova" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-purple-600">
+                </div>
+                <button onclick="confirmarNovaPassword()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition">
+                    Atualizar Password
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        const PASSWORD_CORRETA = "1234"; 
-        let financas = JSON.parse(localStorage.getItem('financas_avancadas')) || { saldo: 0, reserva: 0, economia: 0, saidas: 0 };
-        let historico = JSON.parse(localStorage.getItem('financas_historico')) || [];
-        let chart;
+        let db = JSON.parse(localStorage.getItem('manus_premium_db')) || {
+            password: "1234",
+            movimentos: []
+        };
+
+        let chart1, chart2;
 
         function verificarSenha() {
             const input = document.getElementById('password-input').value;
-            if(input === PASSWORD_CORRETA) {
+            if (input === db.password) {
                 document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('dashboard-screen').classList.remove('hidden');
-                renderizarDados();
-                inicializarGrafico();
+                document.getElementById('app-container').classList.remove('hidden');
+                ajustarCategorias();
+                renderizarTudo();
             } else {
                 document.getElementById('error-msg').classList.remove('hidden');
             }
         }
 
-        function renderizarDados() {
-            document.getElementById('saldo-val').innerText = financas.saldo.toLocaleString('pt-PT', {minimumFractionDigits: 2});
-            document.getElementById('reserva-val').innerText = financas.reserva.toLocaleString('pt-PT', {minimumFractionDigits: 2});
-            document.getElementById('economia-val').innerText = financas.economia.toLocaleString('pt-PT', {minimumFractionDigits: 2});
-            document.getElementById('saidas-val').innerText = financas.saidas.toLocaleString('pt-PT', {minimumFractionDigits: 2});
-
-            const corpo = document.getElementById('historico-corpo');
-            corpo.innerHTML = historico.length === 0 
-                ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhum movimento registado.</td></tr>`
-                : historico.map(item => {
-                    let corTipo = item.tipo === 'despesa' ? 'text-rose-400' : 'text-emerald-400';
-                    return `<tr class="hover:bg-slate-750/40 transition">
-                        <td class="p-4 text-slate-400">${item.data}</td>
-                        <td class="p-4 font-medium text-white">${item.desc}</td>
-                        <td class="p-4"><span class="capitalize text-xs px-2.5 py-1 bg-slate-750 rounded-full">${item.tipo}</span></td>
-                        <td class="p-4 text-right font-semibold ${corTipo}">${item.valor.toLocaleString('pt-PT', {minimumFractionDigits: 2})} Kz</td>
-                    </tr>`;
-                }).join('');
-
-            if(chart) atualizarGrafico();
+        function toggleMenuPerfil() {
+            document.getElementById('perfil-dropdown').classList.toggle('hidden');
         }
 
-        function atualizarValores() {
-            const valor = parseFloat(document.getElementById('valor-input').value);
-            const desc = document.getElementById('desc-input').value.trim() || 'Movimento Geral';
-            const tipo = document.getElementById('tipo-input').value;
+        function abrirModalOperacao() { document.getElementById('modal-operacao').classList.remove('hidden'); }
+        function fecharModalOperacao() { document.getElementById('modal-operacao').classList.add('hidden'); }
+        function abrirModalPassword() { 
+            document.getElementById('perfil-dropdown').classList.add('hidden');
+            document.getElementById('modal-password').classList.remove('hidden'); 
+        }
+        function fecharModalPassword() { document.getElementById('modal-password').classList.add('hidden'); }
 
-            if (isNaN(valor) || valor <= 0) return alert("Por favor, insira um valor válido.");
-
-            if (tipo === 'saldo') {
-                financas.saldo += valor;
-            } else if (tipo === 'reserva') {
-                if(financas.saldo >= valor) { financas.saldo -= valor; financas.reserva += valor; }
-                else return alert("Saldo insuficiente para mover para a Reserva.");
-            } else if (tipo === 'economia') {
-                if(financas.saldo >= valor) { financas.saldo -= valor; financas.economia += valor; }
-                else return alert("Saldo insuficiente para mover para as Economias.");
-            } else if (tipo === 'despesa') {
-                if(financas.saldo >= valor) { financas.saldo -= valor; financas.saidas += valor; }
-                else return alert("Saldo disponível insuficiente para cobrir esta despesa.");
+        function ajustarCategorias() {
+            const tipo = document.getElementById('op-tipo').value;
+            const catSelect = document.getElementById('op-categoria');
+            catSelect.innerHTML = '';
+            
+            if (tipo === 'receita') {
+                catSelect.innerHTML = `<option value="Salário">Salário</option><option value="Investimentos">Investimentos</option><option value="Outros">Outros</option>`;
+            } else {
+                catSelect.innerHTML = `<option value="Alimentação">Alimentação</option><option value="Casa">Casa</option><option value="Educação">Educação</option><option value="Lazer">Lazer</option><option value="Outros">Outros</option>`;
             }
+        }
 
-            const novaTransacao = {
+        function salvarOperacao() {
+            const valor = parseFloat(document.getElementById('op-valor').value);
+            const desc = document.getElementById('op-desc').value.trim() || 'Movimento Geral';
+            const tipo = document.getElementById('op-tipo').value;
+            const categoria = document.getElementById('op-categoria').value;
+            const mesCorrente = document.getElementById('mes-filtro').value;
+
+            if (isNaN(valor) || valor <= 0) return alert("Insira um valor válido.");
+
+            db.movimentos.unshift({
+                id: Date.now(),
                 data: new Date().toLocaleDateString('pt-PT'),
+                mes: mesCorrente,
                 desc: desc,
                 tipo: tipo,
+                categoria: categoria,
                 valor: valor
-            };
+            });
 
-            historico.unshift(novaTransacao);
-            localStorage.setItem('financas_avancadas', JSON.stringify(financas));
-            localStorage.setItem('financas_historico', JSON.stringify(historico));
-            
-            renderizarDados();
-            
-            document.getElementById('valor-input').value = '';
-            document.getElementById('desc-input').value = '';
+            localStorage.setItem('manus_premium_db', JSON.stringify(db));
+            fecharModalOperacao();
+            renderizarTudo();
+
+            document.getElementById('op-valor').value = '';
+            document.getElementById('op-desc').value = '';
         }
 
-        function inicializarGrafico() {
-            const ctx = document.getElementById('financeChart').getContext('2d');
-            chart = new Chart(ctx, {
+        function renderizarTudo() {
+            const mesSelecionado = document.getElementById('mes-filtro').value;
+            document.getElementById('extrato-mes-nome').innerText = mesSelecionado;
+
+            // Filtrar movimentos do mês selecionado
+            const dadosMes = db.movimentos.filter(m => m.mes === mesSelecionado);
+
+            let saldoTotal = 0, receitas = 0, despesas = 0, cartao = 0;
+            let catValores = { Alimentação: 0, Casa: 0, Educação: 0, Lazer: 0, Outros: 0 };
+
+            dadosMes.forEach(m => {
+                if (m.tipo === 'receita') {
+                    receitas += m.valor;
+                    saldoTotal += m.valor;
+                } else if (m.tipo === 'despesa') {
+                    despesas += m.valor;
+                    saldoTotal -= m.valor;
+                    if (catValores[m.categoria] !== undefined) catValores[m.categoria] += m.valor;
+                } else if (m.tipo === 'cartao') {
+                    cartao += m.valor;
+                    if (catValores[m.categoria] !== undefined) catValores[m.categoria] += m.valor;
+                }
+            });
+
+            // Atualizar Cards Visuais
+            document.getElementById('card-saldo').innerText = saldoTotal.toLocaleString('pt-PT', {minimumFractionDigits:2});
+            document.getElementById('card-receitas').innerText = receitas.toLocaleString('pt-PT', {minimumFractionDigits:2});
+            document.getElementById('card-despesas').innerText = despesas.toLocaleString('pt-PT', {minimumFractionDigits:2});
+            document.getElementById('card-cartao').innerText = cartao.toLocaleString('pt-PT', {minimumFractionDigits:2});
+
+            // Gerar Histórico na Tabela
+            const corpo = document.getElementById('tabela-corpo');
+            if (dadosMes.length === 0) {
+                corpo.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 font-normal">Nenhum registo efetuado para o mês de ${mesSelecionado}.</td></tr>`;
+            } else {
+                corpo.innerHTML = dadosMes.map(m => {
+                    let cor = m.tipo === 'receita' ? 'text-emerald-600' : (m.tipo === 'cartao' ? 'text-teal-600' : 'text-rose-600');
+                    let sinal = m.tipo === 'receita' ? '+' : '-';
+                    let meio = m.tipo === 'receita' ? 'Dinheiro/Conta' : (m.tipo === 'cartao' ? 'Cartão Crédito' : 'Dinheiro/Conta');
+                    return `<tr class="hover:bg-slate-50/80 transition">
+                        <td class="p-4 text-slate-400">${m.data}</td>
+                        <td class="p-4 text-slate-900 font-bold">${m.desc}</td>
+                        <td class="p-4"><span class="px-2.5 py-1 bg-slate-100 rounded-full text-xs text-slate-600">${m.categoria}</span></td>
+                        <td class="p-4 text-xs text-slate-400">${meio}</td>
+                        <td class="p-4 text-right font-black ${cor}">${sinal} ${m.valor.toLocaleString('pt-PT', {minimumFractionDigits:2})} Kz</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // Atualizar Gráficos
+            atualizarGraficosVisuais(catValores, receitas, despesas, saldoTotal);
+        }
+
+        function atualizarGraficosVisuais(cat, rec, desp, bal) {
+            // Destruir gráficos anteriores para evitar sobreposição
+            if(chart1) chart1.destroy();
+            if(chart2) chart2.destroy();
+
+            // 1. Gráfico de Rosca (Categorias)
+            const ctx1 = document.getElementById('chartCategorias').getContext('2d');
+            chart1 = new Chart(ctx1, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Saldo Disponível', 'Reserva', 'Economias', 'Despesas Totais'],
+                    labels: Object.keys(cat),
                     datasets: [{
-                        data: [financas.saldo, financas.reserva, financas.economia, financas.saidas],
-                        backgroundColor: ['#34d399', '#60a5fa', '#fbbf24', '#f87171'],
-                        borderWidth: 0
+                        data: Object.values(cat),
+                        backgroundColor: ['#a855f7', '#0284c7', '#f59e0b', '#ec4899', '#64748b'],
+                        borderWidth: 2
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 12 } } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            // 2. Gráfico de Barras (Balanço Mensal)
+            const ctx2 = document.getElementById('chartBalanco').getContext('2d');
+            chart2 = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Receitas', 'Despesas', 'Balanço'],
+                    datasets: [{
+                        label: 'Valores em Kz',
+                        data: [rec, desp, bal],
+                        backgroundColor: ['#10b981', '#f43f5e', '#6366f1'],
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
 
-        function atualizarGrafico() {
-            chart.data.datasets[0].data = [financas.saldo, financas.reserva, financas.economia, financas.saidas];
-            chart.update();
+        function confirmarNovaPassword() {
+            const atual = document.getElementById('pw-atual').value;
+            const nova = document.getElementById('pw-nova').value.trim();
+
+            if (atual !== db.password) return alert("A password atual introduzida está errada!");
+            if (nova.length < 4) return alert("A nova password deve conter pelo menos 4 caracteres.");
+
+            db.password = nova;
+            localStorage.setItem('manus_premium_db', JSON.stringify(db));
+            alert("Password alterada com sucesso!");
+            fecharModalPassword();
+            document.getElementById('pw-atual').value = '';
+            document.getElementById('pw-nova').value = '';
         }
 
         function limparDados() {
-            if(confirm("Tem a certeza que deseja apagar todo o histórico e saldos? Esta ação não pode ser desfeita.")) {
-                localStorage.clear();
-                financas = { saldo: 0, reserva: 0, economy: 0, saidas: 0, economia: 0 };
-                historico = [];
-                renderizarDados();
+            if(confirm("Deseja redefinir todo o sistema? Perderá todos os lançamentos registados.")) {
+                localStorage.removeItem('manus_premium_db');
+                db = { password: "1234", movimentos: [] };
+                renderizarTudo();
+                document.getElementById('perfil-dropdown').classList.add('hidden');
             }
         }
 
         function logout() {
-            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('app-container').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('password-input').value = '';
+            document.getElementById('perfil-dropdown').classList.add('hidden');
         }
     </script>
 </body>
