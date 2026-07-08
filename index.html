@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Manus - Gestão Financeira Inteligente</title>
+    <title>Sistema Manus V4 - Gestão Financeira Centralizada</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome -->
+    <!-- FontAwesome para ícones profissionais -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
+    <!-- Chart.js para motores gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .hidden { display: none !important; }
@@ -20,58 +20,61 @@
 </head>
 <body class="min-h-screen font-sans flex bg-slate-50 text-slate-800">
 
-    <!-- TELA DE LOGIN -->
+    <!-- TELA DE AUTENTICAÇÃO (LOGIN) -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-100 px-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200">
             <div class="text-center mb-6">
-                <div class="w-12 h-12 bg-purple-700 rounded-xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3">
-                    <i class="fa-solid fa-wallet"></i>
+                <div class="w-12 h-12 bg-purple-700 rounded-xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3 shadow-md">
+                    <i class="fa-solid fa-vault"></i>
                 </div>
                 <h2 class="text-2xl font-extrabold text-purple-900 tracking-wide">SISTEMA MANUS</h2>
-                <p class="text-slate-500 text-sm mt-1">Introduza a sua password</p>
+                <p class="text-slate-500 text-sm mt-1">Insira os dados de autenticação</p>
             </div>
             <div class="space-y-4">
-                <input type="password" id="password-input" placeholder="••••••••" 
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-purple-600 text-slate-900">
-                <button onclick="verificarSenha()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition shadow-lg">
-                    Aceder ao Painel
+                <div>
+                    <label class="text-xs text-slate-400 font-bold uppercase">Chave de Segurança</label>
+                    <input type="password" id="password-input" placeholder="••••••••" 
+                        class="w-full mt-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-purple-600 text-slate-900">
+                </div>
+                <button onclick="autenticarSistema()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition shadow-lg shadow-purple-900/10 cursor-pointer">
+                    Aceder à Plataforma
                 </button>
-                <p id="error-msg" class="text-red-500 text-center text-sm hidden font-medium">Password incorreta!</p>
+                <p id="error-msg" class="text-red-500 text-center text-sm hidden font-medium">Chave incorreta! Tente novamente.</p>
             </div>
         </div>
     </div>
 
-    <!-- APP PRINCIPAL -->
+    <!-- CONTENTOR CENTRAL DO APLICATIVO -->
     <div id="app-container" class="hidden w-full flex min-h-screen">
         
-        <!-- SIDEBAR -->
+        <!-- SIDEBAR DE NAVEGAÇÃO -->
         <aside id="sidebar-main" class="w-20 bg-white border-r border-slate-200 flex flex-col items-center py-6 justify-between shrink-0">
             <div class="flex flex-col items-center gap-6 w-full">
-                <div class="w-10 h-10 bg-purple-700 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-md">
-                    <i class="fa-solid fa-layer-group"></i>
+                <div class="w-10 h-10 bg-purple-700 rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-md shadow-purple-200">
+                    <i class="fa-solid fa-chart-pie"></i>
                 </div>
                 <button onclick="abrirModalOperacao()" class="w-10 h-10 bg-purple-600 hover:bg-purple-700 text-white rounded-full flex items-center justify-center transition shadow-md cursor-pointer">
                     <i class="fa-solid fa-plus"></i>
                 </button>
                 <nav class="flex flex-col gap-2 w-full px-2 mt-4">
-                    <button class="w-full py-3 text-purple-700 bg-purple-50 rounded-xl flex items-center justify-center"><i class="fa-solid fa-house text-lg"></i></button>
-                    <button onclick="toggleTema()" class="w-full py-3 text-slate-400 hover:text-purple-600 rounded-xl flex items-center justify-center transition cursor-pointer"><i class="fa-solid fa-moon text-lg"></i></button>
+                    <button class="w-full py-3 text-purple-700 bg-purple-50 rounded-xl flex items-center justify-center"><i class="fa-solid fa-house"></i></button>
+                    <button onclick="alternarDesignTema()" class="w-full py-3 text-slate-400 hover:text-purple-600 rounded-xl flex items-center justify-center transition cursor-pointer"><i class="fa-solid fa-circle-half-stroke text-lg"></i></button>
                 </nav>
             </div>
-            <button onclick="logout()" class="w-10 h-10 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition"><i class="fa-solid fa-right-from-bracket text-lg"></i></button>
+            <button onclick="terminarSessao()" class="w-10 h-10 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition cursor-pointer"><i class="fa-solid fa-power-off text-lg"></i></button>
         </aside>
 
-        <!-- ÁREA DE CONTEÚDO -->
+        <!-- ESPAÇO DE TRABALHO PRINCIPAL -->
         <main class="flex-1 p-6 md:p-8 space-y-8 overflow-y-auto w-full">
             
-            <!-- CONTROLOS SUPERIORES -->
+            <!-- CONTROLO SUPERIOR & PAINEL DE PERFIL -->
             <div id="top-bar" class="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                <div class="flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full text-sm font-bold border border-amber-200">
-                    <i class="fa-solid fa-crown"></i> <span>Premium</span>
+                <div class="flex items-center gap-2 bg-purple-50 text-purple-700 px-3 py-1.5 rounded-full text-sm font-bold border border-purple-200">
+                    <i class="fa-solid fa-circle-check"></i> <span>Módulos Ativos</span>
                 </div>
 
                 <div>
-                    <select id="mes-filtro" onchange="renderizarTudo()" class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 font-medium text-slate-700 focus:outline-none focus:border-purple-600 cursor-pointer">
+                    <select id="mes-filtro" onchange="processarFluxos()" class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 font-medium text-slate-700 focus:outline-none focus:border-purple-600 cursor-pointer">
                         <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option><option value="Março">Março</option>
                         <option value="Abril">Abril</option><option value="Maio">Maio</option><option value="Junho">Junho</option>
                         <option value="Julho" selected>Julho</option><option value="Agosto">Agosto</option><option value="Setembro">Setembro</option>
@@ -80,95 +83,93 @@
                 </div>
 
                 <div class="relative">
-                    <button onclick="toggleMenuPerfil()" class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 p-1.5 pr-3 rounded-full transition cursor-pointer">
-                        <div class="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold" id="avatar-letra">M</div>
-                        <span class="text-sm font-semibold text-slate-700" id="user-display-name">Manus</span>
+                    <button onclick="toggleDropdownPerfil()" class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 p-1.5 pr-3 rounded-full transition cursor-pointer">
+                        <div class="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-sm" id="avatar-letra">U</div>
+                        <span class="text-sm font-semibold text-slate-700" id="user-display-name">Utilizador</span>
                         <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
                     </button>
                     <div id="perfil-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-20 text-slate-800">
-                        <button onclick="abrirModalPerfil()" class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-user-gear"></i> Perfil & Segurança</button>
+                        <button onclick="abrirModalPerfil()" class="w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 flex items-center gap-2"><i class="fa-solid fa-user-slider"></i> Configurações Conta</button>
                         <hr class="border-slate-100 my-1">
-                        <button onclick="limparDados()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-trash-can"></i> Reiniciar Tudo</button>
+                        <button onclick="redefinirBaseDados()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-rotate"></i> Limpar Histórico</button>
                     </div>
                 </div>
             </div>
 
-            <!-- CARDS DE RESUMO (Inspirados na image-8.png) -->
+            <!-- PAINEL DE SÍNTESE - CONTROLO PATRIMONIAL -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Saldo em Contas</p><p class="text-2xl font-black mt-1"><span id="card-saldo font-bold">0,00</span> Kz</p></div>
-                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-building-columns"></i></div>
+                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Disponibilidade Total</p><p class="text-2xl font-black mt-1 text-slate-900" id="card-saldo">0,00 Kz</p></div>
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-scale-balanced"></i></div>
                 </div>
                 <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Receitas</p><p class="text-2xl font-black mt-1 text-emerald-600"><span id="card-receitas">0,00</span> Kz</p></div>
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Receitas Registadas</p><p class="text-2xl font-black mt-1 text-emerald-600" id="card-receitas">0,00 Kz</p></div>
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-turn-up"></i></div>
                 </div>
                 <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Despesas Totais</p><p class="text-2xl font-black mt-1 text-rose-600"><span id="card-despesas">0,00</span> Kz</p></div>
-                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Despesas Reais</p><p class="text-2xl font-black mt-1 text-rose-600" id="card-despesas">0,00 Kz</p></div>
+                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-turn-down"></i></div>
                 </div>
                 <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Poupanças</p><p class="text-2xl font-black mt-1 text-purple-600"><span id="card-poupancas">0,00</span> Kz</p></div>
+                    <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Fundo de Poupança</p><p class="text-2xl font-black mt-1 text-purple-600" id="card-poupancas">0,00 Kz</p></div>
                     <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-piggy-bank"></i></div>
                 </div>
             </div>
 
-            <!-- ESTRUTURA BANCOS & INDICADORES -->
+            <!-- ANÁLISE DE LIQUIDEZ POR ENTIDADES E INDICADORES -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Controlo de Contas / Bancos -->
+                <!-- Segmentação de Caixas e Bancos -->
                 <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-1">
-                    <h3 class="text-lg font-bold mb-4 flex items-center justify-between"><span>As Minhas Contas / Cartões</span></h3>
-                    <div class="space-y-3" id="lista-bancos">
-                        <!-- Gerado por JS -->
-                    </div>
+                    <h3 class="text-md font-bold text-slate-400 uppercase tracking-wider mb-4">Saldos por Conta / Meio</h3>
+                    <div class="space-y-3" id="lista-bancos"></div>
                 </div>
                 
-                <!-- Indicadores Financeiros Avançados -->
+                <!-- Métricas Avançadas de Performance -->
                 <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2">
-                    <h3 class="text-lg font-bold mb-4">Indicadores Financeiros & Desempenho</h3>
+                    <h3 class="text-md font-bold text-slate-400 uppercase tracking-wider mb-4">Indicadores Analíticos</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 text-center card-alvo">
-                            <p class="text-xs text-slate-400 font-bold uppercase">Taxa de Poupança</p>
-                            <p class="text-xl font-black mt-2 text-purple-600" id="ind-poupanca">0%</p>
+                            <p class="text-xs text-slate-400 font-bold uppercase">Margem de Poupança</p>
+                            <p class="text-2xl font-black mt-2 text-purple-600" id="ind-poupanca">0%</p>
                         </div>
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 text-center card-alvo">
-                            <p class="text-xs text-slate-400 font-bold uppercase">Eficiência de Gastos</p>
-                            <p class="text-xl font-black mt-2 text-blue-600" id="ind-eficiencia">0%</p>
+                            <p class="text-xs text-slate-400 font-bold uppercase">Rácio Operacional</p>
+                            <p class="text-2xl font-black mt-2 text-blue-600" id="ind-eficiencia">0%</p>
                         </div>
-                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 text-center card-alvo">
-                            <p class="text-xs text-slate-400 font-bold uppercase">Status de Balanço</p>
-                            <p class="text-sm font-bold mt-3 px-2 py-1 rounded-full bg-slate-200 inline-block" id="ind-status">Sem Dados</p>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 text-center card-alvo flex flex-col justify-center items-center">
+                            <p class="text-xs text-slate-400 font-bold uppercase mb-2">Comportamento Anual</p>
+                            <span class="text-xs font-bold px-3 py-1.5 rounded-full bg-slate-200 text-slate-700" id="ind-status">Sem Fluxo</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ANÁLISE GRÁFICA -->
+            <!-- ESTRUTURA DOS GRÁFICOS ANALÍTICOS -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-80 flex flex-col justify-between">
-                    <h3 class="text-md font-bold text-slate-500 uppercase tracking-wider mb-2">Distribuição de Despesas</h3>
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Despesas por Categoria</h3>
                     <div class="relative w-full h-full flex items-center justify-center"><canvas id="chartCategorias"></canvas></div>
                 </div>
                 <div class="card-alvo bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-80 flex flex-col justify-between">
-                    <h3 class="text-md font-bold text-slate-500 uppercase tracking-wider mb-2">Balanço Mensal</h3>
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Fluxo Líquido Mensal</h3>
                     <div class="relative w-full h-full flex items-center justify-center"><canvas id="chartBalanco"></canvas></div>
                 </div>
             </div>
 
-            <!-- EXTRATO -->
+            <!-- HISTÓRICO CRONOLÓGICO DE TRANSAÇÕES -->
             <div class="card-alvo bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="text-lg font-bold">Histórico Geral de Transações</h3>
+                <div class="p-6 border-b border-slate-100">
+                    <h3 class="text-lg font-bold">Livro de Razão / Extrato de Atividades</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-xs font-bold uppercase tracking-wider card-alvo">
-                                <th class="p-4">Data</th>
-                                <th class="p-4">Descrição</th>
-                                <th class="p-4">Conta/Meio</th>
+                                <th class="p-4">Data Lançamento</th>
+                                <th class="p-4">Histórico / Descrição</th>
+                                <th class="p-4">Conta Origem</th>
                                 <th class="p-4">Categoria</th>
-                                <th class="p-4 text-right">Valor</th>
+                                <th class="p-4 text-right">Valor Líquido</th>
                             </tr>
                         </thead>
                         <tbody id="tabela-corpo" class="divide-y divide-slate-100 text-sm font-medium"></tbody>
@@ -178,110 +179,110 @@
         </main>
     </div>
 
-    <!-- MODAL: NOVA OPERAÇÃO -->
+    <!-- MODAL INSERÇÃO: REGISTO DE FLUXOS -->
     <div id="modal-operacao" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
         <div class="bg-white rounded-2xl border w-full max-w-md overflow-hidden card-alvo">
             <div class="bg-purple-700 p-4 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg"><i class="fa-solid fa-plus mr-2"></i>Registar Movimento</h3>
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-pen-to-square mr-2"></i>Lançamento de Operação</h3>
                 <button onclick="fecharModalOperacao()" class="text-white/80 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase">Valor (Kz)</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Montante (Kz)</label>
                     <input type="number" id="op-valor" placeholder="0.00" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase">Descrição</label>
-                    <input type="text" id="op-desc" placeholder="Ex: Salário Mençal, Compras" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Descrição da Operação</label>
+                    <input type="text" id="op-desc" placeholder="Ex: Liquidação de Fatura, Prestação de Serviços" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase">Fluxo</label>
-                    <select id="op-tipo" onchange="ajustarFormulario()" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl input-alvo">
-                        <option value="receita">Receita (+ Balance)</option>
-                        <option value="despesa">Despesa (- Balance)</option>
-                        <option value="poupanca">Destinar a Poupança / Reserva</option>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Natureza de Fluxo</label>
+                    <select id="op-tipo" onchange="sincronizarListasFormulario()" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl input-alvo">
+                        <option value="receita">Receita (Entrada / Proveito)</option>
+                        <option value="despesa">Despesa (Saída / Custo)</option>
+                        <option value="poupanca">Retenção de Poupança</option>
                     </select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase">Conta / Origem-Destino</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Conta Patrimonial</label>
                     <select id="op-banco" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl input-alvo"></select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase">Categoria</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Classificação / Categoria</label>
                     <select id="op-categoria" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl input-alvo"></select>
                 </div>
-                <button onclick="salvarOperacao()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition cursor-pointer">Confirmar Lançamento</button>
+                <button onclick="executarLancamento()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition cursor-pointer">Validar e Lançar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: PERFIL & SEGURANÇA -->
+    <!-- MODAL DEFINIÇÕES: GESTÃO DE CONTA -->
     <div id="modal-perfil" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
         <div class="bg-white rounded-2xl border w-full max-w-md overflow-hidden card-alvo">
             <div class="bg-slate-900 p-4 text-white flex justify-between items-center">
-                <h3 class="font-bold"><i class="fa-solid fa-user-gear mr-2"></i>Gestão de Perfil</h3>
+                <h3 class="font-bold"><i class="fa-solid fa-user-gear mr-2"></i>Módulo do Utilizador</h3>
                 <button onclick="fecharModalPerfil()" class="text-white/80 hover:text-white cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase">Nome do Utilizador</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Nome de Utilizador</label>
                     <input type="text" id="prof-nome" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase">Password Atual</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Chave de Segurança Atual</label>
                     <input type="password" id="prof-pw-atual" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase">Nova Password</label>
-                    <input type="password" id="prof-pw-nova" placeholder="Deixe em branco para não alterar" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Nova Chave de Segurança</label>
+                    <input type="password" id="prof-pw-nova" placeholder="Manter em branco para não alterar" class="w-full mt-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none input-alvo">
                 </div>
-                <button onclick="salvarConfigPerfil()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition cursor-pointer">Guardar Alterações</button>
+                <button onclick="salvarAlteracoesPerfil()" class="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white font-semibold rounded-xl transition cursor-pointer">Salvar Novos Parâmetros</button>
             </div>
         </div>
     </div>
 
-    <!-- JS ENGINE -->
+    <!-- LOGIC SYSTEM SCRIPT -->
     <script>
-        let db = JSON.parse(localStorage.getItem('manus_finance_v3')) || {
+        let db = JSON.parse(localStorage.getItem('manus_platform_v4')) || {
             password: "1234",
-            userName: "Manus",
+            userName: "M. Ngumbe",
             theme: "light",
             movimentos: [],
-            saldosBancos: { "Conta Caixa": 0, "Banco BAI": 0, "Banco BFA": 0, "Cartão Multicaixa": 0, "Cartão Crédito": 0 }
+            estruturasContas: { "Caixa Geral": 0, "Conta BFA": 0, "Conta BAI": 0, "Caixa de Crédito": 0 }
         };
 
-        let chart1, chart2;
+        let g1, g2;
 
-        function verificarSenha() {
+        function autenticarSistema() {
             if (document.getElementById('password-input').value === db.password) {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
-                aplicarTemaAtual();
-                ajustarFormulario();
-                renderizarTudo();
+                aplicarEstiloVisualTema();
+                sincronizarListasFormulario();
+                processarFluxos();
             } else {
                 document.getElementById('error-msg').classList.remove('hidden');
             }
         }
 
-        function aplicarTemaAtual() {
-            const isDark = db.theme === 'dark';
-            document.body.classList.toggle('dark-theme', isDark);
-            document.getElementById('sidebar-main').classList.toggle('dark-card', isDark);
-            document.getElementById('top-bar').classList.toggle('dark-card', isDark);
-            document.querySelectorAll('.card-alvo').forEach(c => c.classList.toggle('dark-card', isDark));
-            document.querySelectorAll('.input-alvo').forEach(i => i.classList.toggle('dark-input', isDark));
-            document.getElementById('perfil-dropdown').classList.toggle('dark-card', isDark);
+        function aplicarEstiloVisualTema() {
+            const darkAtivo = db.theme === 'dark';
+            document.body.classList.toggle('dark-theme', darkAtivo);
+            document.getElementById('sidebar-main').classList.toggle('dark-card', darkAtivo);
+            document.getElementById('top-bar').classList.toggle('dark-card', darkAtivo);
+            document.querySelectorAll('.card-alvo').forEach(c => c.classList.toggle('dark-card', darkAtivo));
+            document.querySelectorAll('.input-alvo').forEach(i => i.classList.toggle('dark-input', darkAtivo));
+            document.getElementById('perfil-dropdown').classList.toggle('dark-card', darkAtivo);
         }
 
-        function toggleTema() {
+        function alternarDesignTema() {
             db.theme = db.theme === 'light' ? 'dark' : 'light';
-            localStorage.setItem('manus_finance_v3', JSON.stringify(db));
-            aplicarTemaAtual();
-            renderizarTudo();
+            localStorage.setItem('manus_platform_v4', JSON.stringify(db));
+            aplicarEstiloVisualTema();
+            processarFluxos();
         }
 
-        function toggleMenuPerfil() { document.getElementById('perfil-dropdown').classList.toggle('hidden'); }
+        function toggleDropdownPerfil() { document.getElementById('perfil-dropdown').classList.toggle('hidden'); }
         function abrirModalOperacao() { document.getElementById('modal-operacao').classList.remove('hidden'); }
         function fecharModalOperacao() { document.getElementById('modal-operacao').classList.add('hidden'); }
         function abrirModalPerfil() {
@@ -291,158 +292,160 @@
         }
         function fecharModalPerfil() { document.getElementById('modal-perfil').classList.add('hidden'); }
 
-        function ajustarFormulario() {
-            const tipo = document.getElementById('op-tipo').value;
-            const bSelect = document.getElementById('op-banco');
-            const cSelect = document.getElementById('op-categoria');
+        function sincronizarListasFormulario() {
+            const fluxo = document.getElementById('op-tipo').value;
+            const bSel = document.getElementById('op-banco');
+            const cSel = document.getElementById('op-categoria');
             
-            bSelect.innerHTML = Object.keys(db.saldosBancos).map(b => `<option value="${b}">${b}</option>`).join('');
+            bSel.innerHTML = Object.keys(db.estruturasContas).map(b => `<option value="${b}">${b}</option>`).join('');
             
-            if(tipo === 'receita') {
-                cSelect.innerHTML = '<option value="Salário">Salário</option><option value="Negócios">Negócios</option><option value="Outros">Outros</option>';
-            } else if(tipo === 'despesa') {
-                cSelect.innerHTML = '<option value="Alimentação">Alimentação</option><option value="Casa">Casa</option><option value="Educação">Educação</option><option value="Impostos/Taxas">Impostos/Taxas</option><option value="Outros">Outros</option>';
+            if(fluxo === 'receita') {
+                cSel.innerHTML = '<option value="Honorários">Honorários</option><option value="Vendas / Serviços">Vendas / Serviços</option><option value="Outros">Outros</option>';
+            } else if(fluxo === 'despesa') {
+                cSelect = cSel.innerHTML = '<option value="Alimentação">Alimentação</option><option value="Casa">Casa</option><option value="Educação">Educação</option><option value="Impostos">Impostos</option><option value="Gerais">Gerais</option>';
             } else {
-                cSelect.innerHTML = '<option value="Fundo de Emergência">Fundo de Emergência</option><option value="Investimentos Longo Prazo">Investimentos</option>';
+                cSel.innerHTML = '<option value="Reserva de Emergência">Reserva de Emergência</option><option value="Investimentos Fundo">Investimentos Fundo</option>';
             }
         }
 
-        function salvarOperacao() {
-            const valor = parseFloat(document.getElementById('op-valor').value);
-            const desc = document.getElementById('op-desc').value.trim() || 'Movimento';
-            const tipo = document.getElementById('op-tipo').value;
-            const banco = document.getElementById('op-banco').value;
-            const categoria = document.getElementById('op-categoria').value;
-            const mes = document.getElementById('mes-filtro').value;
+        function executarLancamento() {
+            const v = parseFloat(document.getElementById('op-valor').value);
+            const d = document.getElementById('op-desc').value.trim() || 'Operação Sem Descrição';
+            const t = document.getElementById('op-tipo').value;
+            const b = document.getElementById('op-banco').value;
+            const c = document.getElementById('op-categoria').value;
+            const m = document.getElementById('mes-filtro').value;
 
-            if (isNaN(valor) || valor <= 0) return alert("Insira um valor.");
+            if (isNaN(v) || v <= 0) return alert("Por favor, introduza um montante válido.");
 
-            db.movimentos.unshift({ id: Date.now(), data: new Date().toLocaleDateString('pt-PT'), mes, desc, tipo, banco, categoria, valor });
-            localStorage.setItem('manus_finance_v3', JSON.stringify(db));
+            db.movimentos.unshift({ id: Date.now(), data: new Date().toLocaleDateString('pt-PT'), mes: m, desc: d, tipo: t, banco: b, categoria: c, valor: v });
+            localStorage.setItem('manus_platform_v4', JSON.stringify(db));
             fecharModalOperacao();
-            renderizarTudo();
+            processarFluxos();
             document.getElementById('op-valor').value = '';
             document.getElementById('op-desc').value = '';
         }
 
-        function renderizarTudo() {
+        function processarFluxos() {
             document.getElementById('user-display-name').innerText = db.userName;
             document.getElementById('avatar-letra').innerText = db.userName.charAt(0).toUpperCase();
             
-            const mesSel = document.getElementById('mes-filtro').value;
-            const dadosMes = db.movimentos.filter(m => m.mes === mesSel);
+            const mesAtual = document.getElementById('mes-filtro').value;
+            const movimentosMes = db.movimentos.filter(m => m.mes === mesAtual);
 
-            // Reset saldos estruturais base
-            let saldosConstruidos = { "Conta Caixa": 0, "Banco BAI": 0, "Banco BFA": 0, "Cartão Multicaixa": 0, "Cartão Crédito": 0 };
-            let receitas = 0, despesas = 0, poupancas = 0;
-            let categoriasMapa = { Alimentação: 0, Casa: 0, Educação: 0, "Impostos/Taxas": 0, Outros: 0 };
+            let caixaBalanco = { "Caixa Geral": 0, "Conta BFA": 0, "Conta BAI": 0, "Caixa de Crédito": 0 };
+            let rMes = 0, dMes = 0, pMes = 0;
+            let mapaSetores = { Alimentação: 0, Casa: 0, Educação: 0, Impostos: 0, Gerais: 0 };
 
-            // Processamento histórico completo para saldos cumulativos corretos
+            // Cálculo cumulativo estrito para apuramento patrimonial real
             db.movimentos.forEach(m => {
-                if(m.tipo === 'receita') saldosConstruidos[m.banco] += m.valor;
-                if(m.tipo === 'despesa') saldosConstruidos[m.banco] -= m.valor;
-                if(m.tipo === 'poupanca') saldosConstruidos[m.banco] -= m.valor;
+                if(m.tipo === 'receita') caixaBalanco[m.banco] += m.valor;
+                if(m.tipo === 'despesa') caixaBalanco[m.banco] -= m.valor;
+                if(m.tipo === 'poupanca') caixaBalanco[m.banco] -= m.valor;
             });
 
-            // Processamento exclusivo do mês selecionado para KPIs e gráficos
-            dadosMes.forEach(m => {
-                if(m.tipo === 'receita') receitas += m.valor;
-                if(m.tipo === 'despesa') { despesas += m.valor; if(categoriasMapa[m.categoria] !== undefined) categoriasMapa[m.categoria] += m.valor; }
-                if(m.tipo === 'poupanca') poupancas += m.valor;
+            // Apuramento exclusivo para métricas operacionais do mês selecionado
+            movimentosMes.forEach(m => {
+                if(m.tipo === 'receita') rMes += m.valor;
+                if(m.tipo === 'despesa') { dMes += m.valor; if(mapaSetores[m.categoria] !== undefined) mapaSetores[m.categoria] += m.valor; }
+                if(m.tipo === 'poupanca') pMes += m.valor;
             });
 
-            let saldoTotalContas = Object.values(saldosConstruidos).reduce((a, b) => a + b, 0);
+            let disponibilidadeGeral = Object.values(caixaBalanco).reduce((x, y) => x + y, 0);
 
-            // Injetar nos cards
-            document.getElementById('card-saldo font-bold').innerText = saldoTotalContas.toLocaleString('pt-PT', {minimumFractionDigits:2});
-            document.getElementById('card-receitas').innerText = receitas.toLocaleString('pt-PT', {minimumFractionDigits:2});
-            document.getElementById('card-despesas').innerText = despesas.toLocaleString('pt-PT', {minimumFractionDigits:2});
-            document.getElementById('card-poupancas').innerText = poupancas.toLocaleString('pt-PT', {minimumFractionDigits:2});
+            // Injeção de valores na interface de utilizador
+            document.getElementById('card-saldo').innerText = availabilityDisplay(disponibilidadeGeral);
+            document.getElementById('card-receitas').innerText = availabilityDisplay(rMes);
+            document.getElementById('card-despesas').innerText = availabilityDisplay(dMes);
+            document.getElementById('card-poupancas').innerText = availabilityDisplay(pMes);
 
-            // Listar Bancos estruturalmente
-            document.getElementById('lista-bancos').innerHTML = Object.keys(saldosConstruidos).map(b => {
-                let s = saldosConstruidos[b];
-                return `<div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-50/50 card-alvo">
-                    <span class="text-sm font-semibold"><i class="fa-solid fa-money-check-dollar text-purple-600 mr-2"></i>${b}</span>
-                    <span class="font-bold ${s >= 0 ? 'text-slate-700' : 'text-red-500'}">${s.toLocaleString('pt-PT', {minimumFractionDigits:2})} Kz</span>
+            // Geração de Listas Dinâmicas de Liquidez
+            document.getElementById('lista-bancos').innerHTML = Object.keys(caixaBalanco).map(cb => {
+                let s = caixaBalanco[cb];
+                return `<div class="flex justify-between items-center p-2 rounded-xl bg-slate-50/50 card-alvo">
+                    <span class="text-xs font-semibold"><i class="fa-solid fa-wallet text-purple-600 mr-2"></i>${cb}</span>
+                    <span class="font-bold text-xs ${s >= 0 ? 'text-slate-600' : 'text-red-500'}">${s.toLocaleString('pt-PT', {minimumFractionDigits:2})} Kz</span>
                 </div>`;
             }).join('');
 
-            // Indicadores
-            let txPoup = receitas > 0 ? Math.round((poupancas / receitas) * 100) : 0;
-            let txEfic = receitas > 0 ? Math.round(((receitas - despesas) / receitas) * 100) : 0;
-            document.getElementById('ind-poupanca').innerText = `${txPoup}%`;
-            document.getElementById('ind-eficiencia').innerText = `${txEfic}%`;
+            // Cálculos e Processamento dos Indicadores de Desempenho
+            let mPoup = rMes > 0 ? Math.round((pMes / rMes) * 100) : 0;
+            let rOp = rMes > 0 ? Math.round(((rMes - dMes) / rMes) * 100) : 0;
+            document.getElementById('ind-poupanca').innerText = `${mPoup}%`;
+            document.getElementById('ind-eficiencia').innerText = `${rOp}%`;
             
-            const indStatus = document.getElementById('ind-status');
-            if(receitas === 0 && despesas === 0) { indStatus.innerText = "Sem Dados"; indStatus.className = "text-sm font-bold mt-3 px-2 py-1 rounded-full bg-slate-200 inline-block text-slate-700"; }
-            else if(receitas >= despesas) { indStatus.innerText = "Superavitário"; indStatus.className = "text-sm font-bold mt-3 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700"; }
-            else { indStatus.innerText = "Deficitário"; indStatus.className = "text-sm font-bold mt-3 px-3 py-1 rounded-full bg-rose-100 text-rose-700"; }
+            const badgeStatus = document.getElementById('ind-status');
+            if(rMes === 0 && dMes === 0) { badgeStatus.innerText = "Sem Lançamentos"; badgeStatus.className = "text-xs font-bold px-2 py-1 rounded-full bg-slate-200 text-slate-700"; }
+            else if(rMes >= dMes) { badgeStatus.innerText = "Balanço Positivo"; badgeStatus.className = "text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700"; }
+            else { badgeStatus.innerText = "Défice de Caixa"; badgeStatus.className = "text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-700"; }
 
-            // Tabela
-            const corpo = document.getElementById('tabela-corpo');
-            if(dadosMes.length === 0) {
-                corpo.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Sem registos em ${mesSel}.</td></tr>`;
+            // Atualização da Tabela de Extratos
+            const tableBody = document.getElementById('tabela-corpo');
+            if(movimentosMes.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Nenhum registo contabilístico detetado no mês de ${mesAtual}.</td></tr>`;
             } else {
-                corpo.innerHTML = dadosMes.map(m => {
-                    let cor = m.tipo === 'receita' ? 'text-emerald-600' : (m.tipo === 'poupanca' ? 'text-purple-600' : 'text-rose-600');
+                tableBody.innerHTML = movimentosMes.map(m => {
+                    let c = m.tipo === 'receita' ? 'text-emerald-600' : (m.tipo === 'poupanca' ? 'text-purple-600' : 'text-rose-600');
                     return `<tr class="hover:bg-slate-50/40 transition">
                         <td class="p-4 text-slate-400 text-xs">${m.data}</td>
-                        <td class="p-4 font-bold">${m.desc}</td>
+                        <td class="p-4 font-bold text-xs">${m.desc}</td>
                         <td class="p-4 text-xs text-slate-400">${m.banco}</td>
                         <td class="p-4"><span class="px-2 py-0.5 bg-purple-50 text-purple-700 text-xs rounded-full font-bold">${m.categoria}</span></td>
-                        <td class="p-4 text-right font-black ${cor}">${m.tipo==='receita'?'+':'-'} ${m.valor.toLocaleString('pt-PT', {minimumFractionDigits:2})} Kz</td>
+                        <td class="p-4 text-right font-black text-xs ${c}">${m.tipo==='receita'?'+':'-'} ${m.valor.toLocaleString('pt-PT', {minimumFractionDigits:2})} Kz</td>
                     </tr>`;
                 }).join('');
             }
 
-            atualizarGraficos(categoriasMapa, receitas, despesas, (receitas-despesas));
+            atualizarPainelGraficos(mapaSetores, rMes, dMes, (rMes-dMes));
         }
 
-        function atualizarGraficos(cat, rec, desp, bal) {
-            if(chart1) chart1.destroy();
-            if(chart2) chart2.destroy();
+        function availabilityDisplay(val) {
+            return `${val.toLocaleString('pt-PT', {minimumFractionDigits:2})} Kz`;
+        }
+
+        function atualizarPainelGraficos(setores, r, d, b) {
+            if(g1) g1.destroy(); if(g2) g2.destroy();
             const dark = db.theme === 'dark';
             const corTexto = dark ? '#f1f5f9' : '#334155';
 
-            chart1 = new Chart(document.getElementById('chartCategorias').getContext('2d'), {
+            g1 = new Chart(document.getElementById('chartCategorias').getContext('2d'), {
                 type: 'doughnut',
-                data: { labels: Object.keys(cat), datasets: [{ data: Object.values(cat), backgroundColor: ['#a855f7', '#3b82f6', '#eab308', '#ef4444', '#64748b'] }] },
+                data: { labels: Object.keys(setores), datasets: [{ data: Object.values(setores), backgroundColor: ['#a855f7', '#3b82f6', '#eab308', '#ef4444', '#64748b'] }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: corTexto } } } }
             });
 
-            chart2 = new Chart(document.getElementById('chartBalanco').getContext('2d'), {
+            g2 = new Chart(document.getElementById('chartBalanco').getContext('2d'), {
                 type: 'bar',
-                data: { labels: ['Receitas', 'Despesas', 'Balanço'], datasets: [{ data: [rec, desp, bal], backgroundColor: ['#10b981', '#f43f5e', '#6366f1'] }] },
+                data: { labels: ['Créditos', 'Débitos', 'Resultado'], datasets: [{ data: [r, d, b], backgroundColor: ['#10b981', '#f43f5e', '#6366f1'] }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: corTexto } }, x: { ticks: { color: corTexto } } } }
             });
         }
 
-        function salvarConfigPerfil() {
-            const nome = document.getElementById('prof-nome').value.trim();
-            const atual = document.getElementById('prof-pw-atual').value;
-            const nova = document.getElementById('prof-pw-nova').value.trim();
+        function salvarAlteracoesPerfil() {
+            const n = document.getElementById('prof-nome').value.trim();
+            const a = document.getElementById('prof-pw-atual').value;
+            const nv = document.getElementById('prof-pw-nova').value.trim();
 
-            if (atual !== db.password) return alert("Password atual incorreta!");
-            if (nome.length < 2) return alert("Insira um nome válido.");
+            if (a !== db.password) return alert("Chave de segurança atual incorreta!");
+            if (n.length < 2) return alert("Insira um nome válido para o registo.");
 
-            db.userName = nome;
-            if(nova.length >= 4) db.password = nova;
+            db.userName = n;
+            if(nv.length >= 4) db.password = nv;
 
-            localStorage.setItem('manus_finance_v3', JSON.stringify(db));
-            alert("Perfil atualizado com sucesso!");
+            localStorage.setItem('manus_platform_v4', JSON.stringify(db));
+            alert("Parâmetros atualizados com sucesso.");
             fecharModalPerfil();
-            renderizarTudo();
+            processarFluxos();
         }
 
-        function limparDados() {
-            if(confirm("Deseja apagar todos os dados e reiniciar?")) {
-                localStorage.removeItem('manus_finance_v3');
+        function redefinirBaseDados() {
+            if(confirm("Confirma a eliminação completa dos registos do sistema?")) {
+                localStorage.removeItem('manus_platform_v4');
                 location.reload();
             }
         }
 
-        function logout() { location.reload(); }
+        function terminarSessao() { location.reload(); }
     </script>
 </body>
 </html>
